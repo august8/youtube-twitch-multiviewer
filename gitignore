@@ -1,0 +1,55 @@
+# 環境変数
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# エディタ・IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ログファイル
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 依存関係
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+*.pyo
+.Python
+
+# ビルド成果物
+dist/
+build/
+out/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# テスト・カバレッジ
+coverage/
+.nyc_output/
+*.cover
+.pytest_cache/
+
+# 一時ファイル
+tmp/
+temp/
+*.tmp
+
+# その他
+.cache/
