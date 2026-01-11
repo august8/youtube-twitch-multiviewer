@@ -21,5 +21,7 @@ export interface VideoState {
   toggleMute: (id: string) => void
   setYtApiReady: (ready: boolean) => void
   setModalOpen: (open: boolean) => void
+  setWelcomeVisible: (visible: boolean) => void
   startViewing: () => void
+  loadVideosFromUrl: (videos: Omit<VideoItem, 'id' | 'isChatVisible' | 'isMuted'>[]) => void
 }

@@ -1,27 +1,29 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useVideoStore } from '@/stores/videoStore'
 import { parseVideoUrl, detectPlatform } from '@/utils/urlParser'
+import { getShareableUrl, copyToClipboard } from '@/utils/urlState'
 
 export function ControlsModal() {
   const isModalOpen = useVideoStore((state) => state.isModalOpen)
   const setModalOpen = useVideoStore((state) => state.setModalOpen)
   const addVideo = useVideoStore((state) => state.addVideo)
   const resetVideos = useVideoStore((state) => state.resetVideos)
+  const videos = useVideoStore((state) => state.videos)
 
   const [url, setUrl] = useState('')
-  const [isLive, setIsLive] = useState(true)
-  const [showLiveToggle, setShowLiveToggle] = useState(true)
+  const [isLiveOverride, setIsLiveOverride] = useState<boolean | null>(null)
+  const [shareMessage, setShareMessage] = useState('')
 
-  useEffect(() => {
-    const platform = detectPlatform(url)
-    if (platform === 'twitch') {
-      const isVod = url.includes('/videos/')
-      setShowLiveToggle(isVod)
-      setIsLive(!isVod)
-    } else if (platform === 'youtube') {
-      setShowLiveToggle(true)
-    }
-  }, [url])
+  const platform = useMemo(() => detectPlatform(url), [url])
+  const isTwitchVod = platform === 'twitch' && url.includes('/videos/')
+
+  const showLiveToggle = platform === 'youtube' || isTwitchVod
+  const isLive = isLiveOverride ?? !isTwitchVod
+
+  const handleUrlChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value)
+    setIsLiveOverride(null)
+  }, [])
 
   const handleAdd = useCallback(() => {
     const parsed = parseVideoUrl(url.trim())
@@ -37,11 +39,27 @@ export function ControlsModal() {
       isLive: parsed.platform === 'twitch' ? parsed.twitchType === 'channel' : isLive,
     })
     setUrl('')
+    setIsLiveOverride(null)
   }, [url, isLive, addVideo])
 
   const handleReset = useCallback(() => {
     resetVideos()
   }, [resetVideos])
+
+  const handleShare = useCallback(async () => {
+    if (videos.length === 0) {
+      setShareMessage('共有する動画がありません')
+      setTimeout(() => setShareMessage(''), 2000)
+      return
+    }
+
+    const shareUrl = getShareableUrl(videos)
+    console.log('Share URL generated:', shareUrl)
+    console.log('Videos to share:', videos)
+    const success = await copyToClipboard(shareUrl)
+    setShareMessage(success ? 'URLをコピーしました！' : 'コピーに失敗しました')
+    setTimeout(() => setShareMessage(''), 2000)
+  }, [videos])
 
   const handleClose = useCallback(() => {
     setModalOpen(false)
@@ -76,7 +94,7 @@ export function ControlsModal() {
         <input
           type="text"
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={handleUrlChange}
           onKeyPress={handleKeyPress}
           placeholder="YouTube または Twitch の URL を入力"
           className="w-full px-3 py-2 rounded bg-white text-gray-900 text-sm"
@@ -87,7 +105,7 @@ export function ControlsModal() {
             <input
               type="checkbox"
               checked={isLive}
-              onChange={(e) => setIsLive(e.target.checked)}
+              onChange={(e) => setIsLiveOverride(e.target.checked)}
               className="w-4 h-4"
             />
             ライブ配信（チャット機能を有効化）
@@ -109,15 +127,25 @@ export function ControlsModal() {
           </button>
         </div>
 
-        <button
-          onClick={handleClose}
-          className="w-full py-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors"
-        >
-          閉じる
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleShare}
+            className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
+          >
+            共有URLをコピー
+          </button>
+          <button
+            onClick={handleClose}
+            className="flex-1 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors"
+          >
+            閉じる
+          </button>
+        </div>
+
+        {shareMessage && <div className="text-center text-sm text-green-400">{shareMessage}</div>}
 
         <div className="text-center pt-3 border-t border-gray-700 text-xs text-gray-500">
-          v2.0.0 (React)
+          v2.1.0 (React)
         </div>
       </div>
     </div>
