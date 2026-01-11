@@ -1,4 +1,4 @@
-import { useEffect, useRef, useImperativeHandle, forwardRef } from 'react'
+import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react'
 import { useVideoStore } from '@/stores/videoStore'
 
 export interface YouTubePlayerHandle {
@@ -19,6 +19,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>
     const playerRef = useRef<YT.Player | null>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const intervalRef = useRef<number | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
 
     useImperativeHandle(ref, () => ({
       seekTo: (seconds: number) => {
@@ -58,6 +59,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>
         },
         events: {
           onReady: () => {
+            setIsLoading(false)
             onReady?.()
             intervalRef.current = window.setInterval(() => {
               if (playerRef.current) {
@@ -71,6 +73,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>
             }, 1000)
           },
           onError: (event: YT.OnErrorEvent) => {
+            setIsLoading(false)
             const errorMessages: Record<number, string> = {
               2: '無効なパラメータです',
               5: 'HTML5 プレイヤーのエラー',
@@ -91,14 +94,18 @@ export const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>
       }
     }, [ytApiReady, videoId, onTimeUpdate, onReady])
 
-    if (!ytApiReady) {
-      return (
-        <div className="w-full h-full flex items-center justify-center text-gray-500">
-          YouTube API を読み込み中...
-        </div>
-      )
-    }
-
-    return <div ref={containerRef} className="w-full h-full" />
+    return (
+      <div className="relative w-full h-full">
+        {(!ytApiReady || isLoading) && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black text-gray-400 gap-3 z-10">
+            <div className="w-8 h-8 border-2 border-gray-600 border-t-blue-500 rounded-full animate-spin" />
+            <span className="text-sm">
+              {!ytApiReady ? 'YouTube API を読み込み中...' : '動画を読み込み中...'}
+            </span>
+          </div>
+        )}
+        <div ref={containerRef} className="w-full h-full" />
+      </div>
+    )
   }
 )
