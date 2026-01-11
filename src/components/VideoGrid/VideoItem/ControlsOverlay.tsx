@@ -43,14 +43,10 @@ export function ControlsOverlay({
           !isLive
             ? 'bg-gray-600/50 text-gray-400 cursor-not-allowed'
             : isChatVisible
-            ? 'bg-green-600/80 hover:bg-green-600 text-white'
-            : 'bg-blue-600/80 hover:bg-blue-600 text-white'
+              ? 'bg-green-600/80 hover:bg-green-600 text-white'
+              : 'bg-blue-600/80 hover:bg-blue-600 text-white'
         }`}
-        title={
-          !isLive
-            ? 'アーカイブ動画ではチャット機能は利用できません'
-            : 'チャットを表示/非表示'
-        }
+        title={!isLive ? 'アーカイブ動画ではチャット機能は利用できません' : 'チャットを表示/非表示'}
       >
         💬
       </button>

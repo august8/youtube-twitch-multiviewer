@@ -39,7 +39,9 @@ export function VideoItem({ video }: VideoItemProps) {
     if (video.isLive) {
       toggleChat(video.id)
     } else {
-      alert('アーカイブ動画ではチャットリプレイは利用できません。\nライブ配信中の動画のみチャット機能が有効です。')
+      alert(
+        'アーカイブ動画ではチャットリプレイは利用できません。\nライブ配信中の動画のみチャット機能が有効です。'
+      )
     }
   }, [video.id, video.isLive, toggleChat])
 
@@ -52,10 +54,7 @@ export function VideoItem({ video }: VideoItemProps) {
       <div className="flex flex-col flex-1 min-w-0">
         <div className="relative bg-black flex-1 min-w-0">
           {video.platform === 'twitch' ? (
-            <TwitchPlayer
-              videoId={video.videoId}
-              twitchType={video.twitchType || 'channel'}
-            />
+            <TwitchPlayer videoId={video.videoId} twitchType={video.twitchType || 'channel'} />
           ) : (
             <YouTubePlayer
               ref={youtubePlayerRef}
