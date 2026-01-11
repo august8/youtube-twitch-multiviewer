@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback } from 'react'
+import { toast } from 'sonner'
 import type { VideoItem as VideoItemType } from '@/types/video'
 import { useVideoStore } from '@/stores/videoStore'
 import { TwitchPlayer } from './TwitchPlayer'
@@ -39,14 +40,13 @@ export function VideoItem({ video }: VideoItemProps) {
     if (video.isLive) {
       toggleChat(video.id)
     } else {
-      alert(
-        'アーカイブ動画ではチャットリプレイは利用できません。\nライブ配信中の動画のみチャット機能が有効です。'
-      )
+      toast.error('アーカイブ動画ではチャット機能は利用できません')
     }
   }, [video.id, video.isLive, toggleChat])
 
   const handleDelete = useCallback(() => {
     removeVideo(video.id)
+    toast.success('動画を削除しました')
   }, [video.id, removeVideo])
 
   return (

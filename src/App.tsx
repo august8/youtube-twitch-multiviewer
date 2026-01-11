@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { Toaster } from 'sonner'
 import { useVideoStore } from '@/stores/videoStore'
 import { useYouTubeAPI } from '@/hooks/useYouTubeAPI'
 import { WelcomeScreen } from '@/components/WelcomeScreen/WelcomeScreen'
@@ -63,6 +64,8 @@ function App() {
           <FloatingButton />
         </>
       )}
+
+      <Toaster position="bottom-right" richColors expand gap={8} />
     </div>
   )
 }

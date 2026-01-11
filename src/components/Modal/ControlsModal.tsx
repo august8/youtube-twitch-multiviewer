@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
+import { toast } from 'sonner'
 import { useVideoStore } from '@/stores/videoStore'
 import { parseVideoUrl, detectPlatform } from '@/utils/urlParser'
 import { getShareableUrl, copyToClipboard } from '@/utils/urlState'
@@ -12,7 +13,6 @@ export function ControlsModal() {
 
   const [url, setUrl] = useState('')
   const [isLiveOverride, setIsLiveOverride] = useState<boolean | null>(null)
-  const [shareMessage, setShareMessage] = useState('')
 
   const platform = useMemo(() => detectPlatform(url), [url])
   const isTwitchVod = platform === 'twitch' && url.includes('/videos/')
@@ -28,7 +28,7 @@ export function ControlsModal() {
   const handleAdd = useCallback(() => {
     const parsed = parseVideoUrl(url.trim())
     if (!parsed) {
-      alert('YouTube または Twitch の URL を入力してください。')
+      toast.error('YouTube または Twitch の URL を入力してください')
       return
     }
 
@@ -38,27 +38,33 @@ export function ControlsModal() {
       twitchType: parsed.twitchType,
       isLive: parsed.platform === 'twitch' ? parsed.twitchType === 'channel' : isLive,
     })
+    toast.success('動画を追加しました')
     setUrl('')
     setIsLiveOverride(null)
   }, [url, isLive, addVideo])
 
   const handleReset = useCallback(() => {
+    if (videos.length === 0) {
+      toast.error('削除する動画がありません')
+      return
+    }
     resetVideos()
-  }, [resetVideos])
+    toast.success('全ての動画を削除しました')
+  }, [videos.length, resetVideos])
 
   const handleShare = useCallback(async () => {
     if (videos.length === 0) {
-      setShareMessage('共有する動画がありません')
-      setTimeout(() => setShareMessage(''), 2000)
+      toast.error('共有する動画がありません')
       return
     }
 
     const shareUrl = getShareableUrl(videos)
-    console.log('Share URL generated:', shareUrl)
-    console.log('Videos to share:', videos)
     const success = await copyToClipboard(shareUrl)
-    setShareMessage(success ? 'URLをコピーしました！' : 'コピーに失敗しました')
-    setTimeout(() => setShareMessage(''), 2000)
+    if (success) {
+      toast.success('URLをコピーしました！')
+    } else {
+      toast.error('コピーに失敗しました')
+    }
   }, [videos])
 
   const handleClose = useCallback(() => {
@@ -141,8 +147,6 @@ export function ControlsModal() {
             閉じる
           </button>
         </div>
-
-        {shareMessage && <div className="text-center text-sm text-green-400">{shareMessage}</div>}
 
         <div className="text-center pt-3 border-t border-gray-700 text-xs text-gray-500">
           v2.1.0 (React)
