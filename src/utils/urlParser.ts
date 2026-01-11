@@ -37,10 +37,7 @@ export function extractTwitchInfo(url: string): TwitchInfo | null {
     return { type: 'vod', id: vodMatch[1] }
   }
 
-  const channelPatterns = [
-    /(?:twitch\.tv\/)([^\/\s?]+)/,
-    /(?:www\.twitch\.tv\/)([^\/\s?]+)/,
-  ]
+  const channelPatterns = [/(?:twitch\.tv\/)([^/\s?]+)/, /(?:www\.twitch\.tv\/)([^/\s?]+)/]
 
   for (const pattern of channelPatterns) {
     const match = url.match(pattern)
