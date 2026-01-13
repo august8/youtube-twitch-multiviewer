@@ -2,6 +2,7 @@ import { useRef, useState, useCallback } from 'react'
 import { toast } from 'sonner'
 import type { VideoItem as VideoItemType } from '@/types/video'
 import { useVideoStore } from '@/stores/videoStore'
+import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import { TwitchPlayer } from './TwitchPlayer'
 import { YouTubePlayer, type YouTubePlayerHandle } from './YouTubePlayer'
 import { VideoControls } from './VideoControls'
@@ -50,18 +51,20 @@ export function VideoItem({ video }: VideoItemProps) {
   }, [video.id, removeVideo])
 
   return (
-    <div className="flex gap-2 bg-dark-card rounded-lg overflow-hidden min-w-0">
+    <div className="flex gap-2 bg-dark-card rounded-lg overflow-hidden min-w-0 h-full">
       <div className="flex flex-col flex-1 min-w-0">
         <div className="relative bg-black flex-1 min-w-0">
-          {video.platform === 'twitch' ? (
-            <TwitchPlayer videoId={video.videoId} twitchType={video.twitchType || 'channel'} />
-          ) : (
-            <YouTubePlayer
-              ref={youtubePlayerRef}
-              videoId={video.videoId}
-              onTimeUpdate={handleTimeUpdate}
-            />
-          )}
+          <ErrorBoundary>
+            {video.platform === 'twitch' ? (
+              <TwitchPlayer videoId={video.videoId} twitchType={video.twitchType || 'channel'} />
+            ) : (
+              <YouTubePlayer
+                ref={youtubePlayerRef}
+                videoId={video.videoId}
+                onTimeUpdate={handleTimeUpdate}
+              />
+            )}
+          </ErrorBoundary>
 
           <ControlsOverlay
             platform={video.platform}

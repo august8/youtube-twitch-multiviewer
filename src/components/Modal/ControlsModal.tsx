@@ -3,6 +3,14 @@ import { toast } from 'sonner'
 import { useVideoStore } from '@/stores/videoStore'
 import { parseVideoUrl, detectPlatform } from '@/utils/urlParser'
 import { getShareableUrl, copyToClipboard } from '@/utils/urlState'
+import type { LayoutMode } from '@/types/video'
+
+const LAYOUT_OPTIONS: { mode: LayoutMode; label: string; icon: string }[] = [
+  { mode: 'grid', label: 'グリッド', icon: '⊞' },
+  { mode: 'focus', label: 'フォーカス', icon: '◧' },
+  { mode: 'horizontal', label: '横並び', icon: '▭' },
+  { mode: 'vertical', label: '縦並び', icon: '▯' },
+]
 
 export function ControlsModal() {
   const isModalOpen = useVideoStore((state) => state.isModalOpen)
@@ -10,6 +18,8 @@ export function ControlsModal() {
   const addVideo = useVideoStore((state) => state.addVideo)
   const resetVideos = useVideoStore((state) => state.resetVideos)
   const videos = useVideoStore((state) => state.videos)
+  const layoutMode = useVideoStore((state) => state.layoutMode)
+  const setLayoutMode = useVideoStore((state) => state.setLayoutMode)
 
   const [url, setUrl] = useState('')
   const [isLiveOverride, setIsLiveOverride] = useState<boolean | null>(null)
@@ -148,8 +158,28 @@ export function ControlsModal() {
           </button>
         </div>
 
+        <div className="pt-3 border-t border-gray-700">
+          <div className="text-xs text-gray-400 mb-2">レイアウト</div>
+          <div className="grid grid-cols-4 gap-1">
+            {LAYOUT_OPTIONS.map((option) => (
+              <button
+                key={option.mode}
+                onClick={() => setLayoutMode(option.mode)}
+                className={`py-2 px-1 rounded text-xs transition-colors ${
+                  layoutMode === option.mode
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                <div className="text-lg">{option.icon}</div>
+                <div>{option.label}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="text-center pt-3 border-t border-gray-700 text-xs text-gray-500">
-          v2.1.0 (React)
+          v2.2.0 (React)
         </div>
       </div>
     </div>

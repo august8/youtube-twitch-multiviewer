@@ -6,6 +6,7 @@ export const useVideoStore = create<VideoState>((set) => ({
   isWelcomeVisible: true,
   isModalOpen: false,
   ytApiReady: false,
+  layoutMode: 'grid',
 
   addVideo: (video) =>
     set((state) => ({
@@ -44,6 +45,8 @@ export const useVideoStore = create<VideoState>((set) => ({
   setModalOpen: (open) => set({ isModalOpen: open }),
 
   setWelcomeVisible: (visible) => set({ isWelcomeVisible: visible }),
+
+  setLayoutMode: (mode) => set({ layoutMode: mode }),
 
   startViewing: () => set({ isWelcomeVisible: false, isModalOpen: true }),
 

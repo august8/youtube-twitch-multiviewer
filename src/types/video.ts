@@ -1,3 +1,5 @@
+export type LayoutMode = 'grid' | 'focus' | 'horizontal' | 'vertical'
+
 export interface VideoItem {
   id: string
   videoId: string
@@ -13,6 +15,7 @@ export interface VideoState {
   isWelcomeVisible: boolean
   isModalOpen: boolean
   ytApiReady: boolean
+  layoutMode: LayoutMode
 
   addVideo: (video: Omit<VideoItem, 'id' | 'isChatVisible' | 'isMuted'>) => void
   removeVideo: (id: string) => void
@@ -22,6 +25,7 @@ export interface VideoState {
   setYtApiReady: (ready: boolean) => void
   setModalOpen: (open: boolean) => void
   setWelcomeVisible: (visible: boolean) => void
+  setLayoutMode: (mode: LayoutMode) => void
   startViewing: () => void
   loadVideosFromUrl: (videos: Omit<VideoItem, 'id' | 'isChatVisible' | 'isMuted'>[]) => void
 }
