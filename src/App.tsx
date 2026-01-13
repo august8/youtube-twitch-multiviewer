@@ -65,7 +65,7 @@ function App() {
         </>
       )}
 
-      <Toaster position="bottom-right" richColors expand gap={8} />
+      <Toaster position="top-right" richColors expand gap={8} />
     </div>
   )
 }

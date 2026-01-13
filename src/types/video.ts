@@ -12,6 +12,7 @@ export interface VideoItem {
 
 export interface VideoState {
   videos: VideoItem[]
+  videoOrder: Record<string, number>
   isWelcomeVisible: boolean
   isModalOpen: boolean
   ytApiReady: boolean
@@ -28,4 +29,6 @@ export interface VideoState {
   setLayoutMode: (mode: LayoutMode) => void
   startViewing: () => void
   loadVideosFromUrl: (videos: Omit<VideoItem, 'id' | 'isChatVisible' | 'isMuted'>[]) => void
+  reorderVideos: (activeId: string, overId: string) => void
+  getOrderedVideos: () => VideoItem[]
 }

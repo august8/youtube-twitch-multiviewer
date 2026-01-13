@@ -1,32 +1,46 @@
 import { create } from 'zustand'
 import type { VideoState } from '@/types/video'
 
-export const useVideoStore = create<VideoState>((set) => ({
+export const useVideoStore = create<VideoState>((set, get) => ({
   videos: [],
+  videoOrder: {},
   isWelcomeVisible: true,
   isModalOpen: false,
   ytApiReady: false,
   layoutMode: 'grid',
 
   addVideo: (video) =>
-    set((state) => ({
-      videos: [
-        ...state.videos,
-        {
-          ...video,
-          id: `${video.videoId}-${Date.now()}`,
-          isChatVisible: false,
-          isMuted: false,
+    set((state) => {
+      const id = `${video.videoId}-${Date.now()}`
+      const maxOrder = Math.max(0, ...Object.values(state.videoOrder))
+      return {
+        videos: [
+          ...state.videos,
+          {
+            ...video,
+            id,
+            isChatVisible: false,
+            isMuted: false,
+          },
+        ],
+        videoOrder: {
+          ...state.videoOrder,
+          [id]: maxOrder + 1,
         },
-      ],
-    })),
+      }
+    }),
 
   removeVideo: (id) =>
-    set((state) => ({
-      videos: state.videos.filter((v) => v.id !== id),
-    })),
+    set((state) => {
+      const newOrder = { ...state.videoOrder }
+      delete newOrder[id]
+      return {
+        videos: state.videos.filter((v) => v.id !== id),
+        videoOrder: newOrder,
+      }
+    }),
 
-  resetVideos: () => set({ videos: [] }),
+  resetVideos: () => set({ videos: [], videoOrder: {} }),
 
   toggleChat: (id) =>
     set((state) => ({
@@ -50,14 +64,42 @@ export const useVideoStore = create<VideoState>((set) => ({
 
   startViewing: () => set({ isWelcomeVisible: false, isModalOpen: true }),
 
-  loadVideosFromUrl: (videoData) =>
-    set({
-      videos: videoData.map((video, index) => ({
-        ...video,
-        id: `${video.videoId}-${Date.now()}-${index}`,
-        isChatVisible: false,
-        isMuted: false,
-      })),
+  loadVideosFromUrl: (videoData) => {
+    const videos = videoData.map((video, index) => ({
+      ...video,
+      id: `${video.videoId}-${Date.now()}-${index}`,
+      isChatVisible: false,
+      isMuted: false,
+    }))
+    const videoOrder: Record<string, number> = {}
+    videos.forEach((v, i) => {
+      videoOrder[v.id] = i + 1
+    })
+    return set({
+      videos,
+      videoOrder,
       isWelcomeVisible: false,
+    })
+  },
+
+  reorderVideos: (activeId, overId) =>
+    set((state) => {
+      const activeOrder = state.videoOrder[activeId]
+      const overOrder = state.videoOrder[overId]
+      if (activeOrder === undefined || overOrder === undefined) return state
+      return {
+        videoOrder: {
+          ...state.videoOrder,
+          [activeId]: overOrder,
+          [overId]: activeOrder,
+        },
+      }
     }),
+
+  getOrderedVideos: () => {
+    const state = get()
+    return [...state.videos].sort(
+      (a, b) => (state.videoOrder[a.id] ?? 0) - (state.videoOrder[b.id] ?? 0)
+    )
+  },
 }))
