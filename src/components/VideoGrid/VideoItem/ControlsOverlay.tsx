@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 interface ControlsOverlayProps {
   platform: 'youtube' | 'twitch'
   isMuted: boolean
@@ -8,7 +10,7 @@ interface ControlsOverlayProps {
   onDelete: () => void
 }
 
-export function ControlsOverlay({
+export const ControlsOverlay = memo(function ControlsOverlay({
   platform,
   isMuted,
   isChatVisible,
@@ -60,4 +62,4 @@ export function ControlsOverlay({
       </button>
     </div>
   )
-}
+})

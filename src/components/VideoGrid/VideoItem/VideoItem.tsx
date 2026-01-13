@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, memo } from 'react'
 import { toast } from 'sonner'
 import type { VideoItem as VideoItemType } from '@/types/video'
 import { useVideoStore } from '@/stores/videoStore'
@@ -13,7 +13,7 @@ interface VideoItemProps {
   video: VideoItemType
 }
 
-export function VideoItem({ video }: VideoItemProps) {
+export const VideoItem = memo(function VideoItem({ video }: VideoItemProps) {
   const removeVideo = useVideoStore((state) => state.removeVideo)
   const toggleChat = useVideoStore((state) => state.toggleChat)
   const toggleMute = useVideoStore((state) => state.toggleMute)
@@ -93,4 +93,4 @@ export function VideoItem({ video }: VideoItemProps) {
       )}
     </div>
   )
-}
+})

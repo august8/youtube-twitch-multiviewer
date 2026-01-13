@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { formatTime } from '@/utils/timeFormatter'
 
 interface VideoControlsProps {
@@ -5,7 +6,10 @@ interface VideoControlsProps {
   onSeek: (seconds: number) => void
 }
 
-export function VideoControls({ currentTime, onSeek }: VideoControlsProps) {
+export const VideoControls = memo(function VideoControls({
+  currentTime,
+  onSeek,
+}: VideoControlsProps) {
   return (
     <div className="bg-dark-control p-2 flex items-center justify-between gap-2">
       <div className="flex gap-1">
@@ -39,4 +43,4 @@ export function VideoControls({ currentTime, onSeek }: VideoControlsProps) {
       </div>
     </div>
   )
-}
+})
