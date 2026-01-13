@@ -1,167 +1,148 @@
-# Claude開発テンプレート
+# 🎬 YouTube / Twitch マルチビューア
 
-Claude（AI Assistant）を使った開発プロジェクト向けのテンプレートです。
-ミニマルなツールや小規模プロジェクトの開発に最適化されています。
+複数のYouTubeライブ配信やTwitchストリーミングを同時に視聴できるWebアプリケーションです。
 
-## 概要
+![React](https://img.shields.io/badge/React-19-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)
+![Vite](https://img.shields.io/badge/Vite-5.4-purple)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-cyan)
+![License](https://img.shields.io/badge/License-ISC-green)
 
-このテンプレートは、Claudeとの協働開発をスムーズにするための以下の要素を含みます：
+## 機能
 
-- **CLAUDE.md**: Claudeの動作原則とルール（汎用的・再利用可能）
-- **docs/**: プロジェクト固有の情報を格納するディレクトリ
+### 📺 複数配信の同時視聴
+- YouTube・Twitchの配信を同時に表示
+- 動画数に応じた自動グリッドレイアウト
+- 4種類のレイアウトモード（グリッド/フォーカス/横並び/縦並び）
+- ドラッグ&ドロップで動画の並び替え
 
-## ファイル構成
+### 💬 ライブチャット表示
+- 各配信のチャットをサイドパネルで表示/非表示
+- YouTube: ライブチャット埋め込み、右クリックで別ウィンドウ表示
+- Twitch: ライブチャット・VODチャットリプレイ対応
 
-```
-project/
-├── README.md              # このファイル（テンプレート説明）
-├── CLAUDE.md              # Claude動作原則（基本的に編集不要）
-├── gitignore              # .gitignoreのテンプレート
-├── docs/                  # プロジェクト情報（編集可能）
-│   ├── PROJECT.md         # プロジェクト概要
-│   ├── REQUIREMENTS.md    # 要件定義
-│   ├── DECISIONS.md       # 技術的決定の記録
-│   └── notes/             # 改修案、アイデア、メモ
-│       └── (トピック別のファイル)
-├── rules/                 # ルール・ガイド（読み取り専用）
-│   ├── DECISIONS_GUIDE.md # 決定記録の方法
-│   └── COMMIT.md          # コミットメッセージ規約
-└── src/                   # ソースコード
-    └── (プログラムファイル)
-```
+### ⏱️ 再生制御（YouTubeのみ）
+- ±5秒/10秒のシークボタンで配信のズレを調整
+- 現在の再生時間をリアルタイム表示
+- ミュート/ミュート解除
 
-### 各ファイルの役割
+### 🔗 URL共有機能
+- 現在の視聴状態をURLで共有可能
+- 共有URLをワンクリックでコピー
 
-| ファイル/ディレクトリ | 役割 | 編集 |
-|---------|------|------|
-| **CLAUDE.md** | Claudeの動作原則・ルール | 基本不要 |
-| **gitignore** | .gitignoreのテンプレート | .gitignoreにリネームして使用 |
-| **docs/PROJECT.md** | システム概要、技術スタック | 必須・更新可 |
-| **docs/REQUIREMENTS.md** | やりたいこと、スコープ | 必須・更新可 |
-| **docs/DECISIONS.md** | 技術的決定の実記録 | 開発中に追記 |
-| **docs/notes/** | 改修案、アイデア、メモ | 随時追加・更新 |
-| **rules/DECISIONS_GUIDE.md** | 決定記録の方法・タイミング | 参照のみ |
-| **rules/COMMIT.md** | コミット規約 | 参照のみ |
-| **src/** | ソースコード格納場所 | 自由に編集 |
+### 🎨 テーマ切り替え
+- ダークモード/ライトモード対応
+- システム設定に自動連動（デフォルト）
+- 手動での切り替えも可能
+
+### 🔔 その他
+- トースト通知でフィードバック表示
+- ローディング状態の表示
+- エラーバウンダリによる安定動作
+
+## 対応URL形式
+
+### YouTube
+- `https://www.youtube.com/watch?v=VIDEO_ID`
+- `https://youtu.be/VIDEO_ID`
+- `https://www.youtube.com/live/VIDEO_ID`
+- `https://www.youtube.com/embed/VIDEO_ID`
+
+### Twitch
+- `https://www.twitch.tv/CHANNEL_NAME` (チャンネル)
+- `https://www.twitch.tv/videos/VIDEO_ID` (VOD)
 
 ## セットアップ
 
-### 1. テンプレートの配置
+### 必要要件
+- Node.js 18.x 以上
+
+### インストール
 
 ```bash
-# テンプレートをプロジェクトルートに展開
-unzip claude-template.zip -d your-project/
-cd your-project/
+# リポジトリをクローン
+git clone https://github.com/august8/youtube-twitch-multiviewer.git
+cd youtube-twitch-multiviewer
 
-# .gitignoreをリネーム
-mv gitignore .gitignore
+# 依存関係をインストール
+npm install
+
+# 開発サーバーを起動
+npm run dev
 ```
 
-### 2. プロジェクト情報の編集
+### ビルド
 
-以下のファイルを編集してプロジェクト固有の情報を記入してください：
+```bash
+# プロダクションビルド
+npm run build
 
-#### docs/PROJECT.md
-- 何を作るか（1-2行の説明）
-- 技術スタック
-- セットアップ方法
-- 主な機能
-
-#### docs/REQUIREMENTS.md
-- 目的
-- やりたいこと
-- やらないこと（スコープ外）
-
-### 3. 開発開始
-
-Claudeに以下のように指示してください：
-
-```
-CLAUDE.mdとdocs/内のファイルを確認して、
-プロジェクトの開発を始めてください。
+# ビルド結果をプレビュー
+npm run preview
 ```
 
-## 使い方
+## スクリプト
 
-### 基本的なワークフロー
+| コマンド | 説明 |
+|---------|------|
+| `npm run dev` | 開発サーバー起動 |
+| `npm run build` | プロダクションビルド |
+| `npm run preview` | ビルド結果のプレビュー |
+| `npm run lint` | ESLintでコードチェック |
+| `npm run lint:fix` | ESLintで自動修正 |
+| `npm run format` | Prettierでフォーマット |
+| `npm run test` | テスト実行（watchモード） |
+| `npm run test:run` | テスト実行（1回のみ） |
 
-1. **要件を明確化**: docs/REQUIREMENTS.mdに記入
-2. **技術選定**: Claudeと相談しながら決定
-3. **決定を記録**: 重要な決定はdocs/DECISIONS.mdに記録
-4. **実装**: Claudeが段階的に実装
-5. **コミット**: 提案されたコミットメッセージで手動コミット
+## 技術スタック
 
-### 改修案・アイデアの保存
+| カテゴリ | 技術 |
+|---------|------|
+| フレームワーク | React 19 |
+| 言語 | TypeScript 5.9 |
+| ビルドツール | Vite 5.4 |
+| スタイリング | Tailwind CSS 3.4 |
+| 状態管理 | Zustand |
+| ドラッグ&ドロップ | @dnd-kit |
+| トースト通知 | Sonner |
+| テスト | Vitest + React Testing Library |
+| コード品質 | ESLint + Prettier |
 
-開発中に思いついた改修案やアイデアは、docs/notes/に保存できます。
+## プロジェクト構成
 
-**保存方法**:
 ```
-「この改修案をdocs/notes/に保存して」
+src/
+├── components/
+│   ├── common/          # 共通コンポーネント
+│   ├── Modal/           # モーダル関連
+│   ├── VideoGrid/       # 動画グリッド
+│   └── WelcomeScreen/   # ウェルカム画面
+├── hooks/               # カスタムフック
+├── stores/              # Zustandストア
+├── types/               # 型定義
+├── utils/               # ユーティリティ関数
+└── test/                # テスト設定
 ```
 
-Claudeが既存ファイルと関連性を確認し、追記するか新規作成するか提案します。
+## テスト
 
-**例**:
-- UI改善案 → `docs/notes/ui-improvements.md`
-- パフォーマンス改善 → `docs/notes/performance.md`
-- 将来の機能 → `docs/notes/future-features.md`
+60件のテストを実装済み:
 
-### 重要な決定の記録
+- **urlParser**: URL解析（17テスト）
+- **urlState**: URL状態管理（17テスト）
+- **videoStore**: Zustand状態管理（12テスト）
+- **WelcomeScreen**: ウェルカム画面（4テスト）
+- **ControlsModal**: コントロールパネル（10テスト）
 
-技術選定やアーキテクチャ決定を行う際は、docs/DECISIONS.mdに記録してください。
-記録方法の詳細は rules/DECISIONS_GUIDE.md を参照してください。
-
-記録すべきタイミングは以下の通り：
-
-- 技術選定時（ライブラリ、フレームワーク等）
-- アーキテクチャ決定時（構造、API設計等）
-- 問題解決の分岐点（複数の解決策がある時）
-- 制約による決定（パフォーマンス、セキュリティ等）
-- 方針変更時（以前の決定を覆す時）
-
-## 推奨設定（オプション）
-
-### claude-mem
-- Claudeのメモリ機能を有効化することを推奨
-- 技術選定や重要な決定を自動的に記憶
-- docs/DECISIONS.mdと併用することで、より効果的な開発が可能
-- ※必須ではありません
-
-## 特徴
-
-### 安全なGit運用
-- claude-codeは自動的にコミット・プッシュしません
-- 変更内容を確認してから手動でコミット
-- コミットメッセージ案は自動で提案されます
-
-### 段階的な開発
-- 大きな変更は小さなステップに分割
-- 各ステップで動作確認
-- ロールバック可能な状態を維持
-
-### 意思決定の記録
-- 選択した選択肢と理由を記録
-- 選ばなかった選択肢と理由も記録
-- 後から検索・参照が容易
-
-## カスタマイズ
-
-プロジェクトの成長に応じて、以下を追加できます：
-
-- **TESTING.md**: テスト戦略
-- **API.md**: API仕様書
-- **.gitignore**: 言語別の設定
-- **TROUBLESHOOTING.md**: よくある問題集
+```bash
+# テスト実行
+npm run test:run
+```
 
 ## ライセンス
 
-このテンプレートは自由に使用・改変できます。
-
-## バージョン
-
-**v1.0.0** - 2026-01-10
+ISC
 
 ---
 
-**このテンプレートで素晴らしい開発体験を！** 🚀
+**最終更新**: 2026-01-13
