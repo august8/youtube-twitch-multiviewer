@@ -11,7 +11,7 @@ export const VideoControls = memo(function VideoControls({
   onSeek,
 }: VideoControlsProps) {
   return (
-    <div className="bg-dark-control p-2 flex items-center justify-between gap-2">
+    <div className="bg-light-control dark:bg-dark-control p-2 flex items-center justify-between gap-2">
       <div className="flex gap-1">
         <button
           onClick={() => onSeek(-10)}

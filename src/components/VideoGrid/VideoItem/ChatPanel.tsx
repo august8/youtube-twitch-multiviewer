@@ -31,7 +31,7 @@ export function ChatPanel({ platform, videoId, twitchType }: ChatPanelProps) {
 
   return (
     <div
-      className="w-[340px] min-w-[280px] bg-dark-card"
+      className="w-[340px] min-w-[280px] bg-light-card dark:bg-dark-card"
       onContextMenu={handleContextMenu}
       title={platform === 'youtube' ? '右クリックで別ウィンドウで開く' : undefined}
     >

@@ -13,6 +13,7 @@
 | エラーバウンダリ | ✅ 完了 | ErrorBoundary.tsx |
 | ESLint / Prettier | ✅ 完了 | eslint.config.js |
 | React.memo最適化 | ✅ 完了 | VideoItem, VideoControls, ControlsOverlay |
+| ダークモード/ライトモード | ✅ 完了 | システム連動 + 手動切り替え |
 
 ---
 
@@ -24,12 +25,6 @@
 - **対象**: urlParser、urlState、videoStore
 - **実装難易度**: 中
 - **優先度**: 中
-
-### 2. ダークモード/ライトモード切り替え
-- **現状**: ダークモード固定
-- **改善**: システム設定に連動 or 手動切り替え
-- **実装難易度**: 中
-- **優先度**: 低（ダークモード固定で問題なし）
 
 ---
 

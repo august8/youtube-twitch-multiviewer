@@ -1,4 +1,5 @@
 export type LayoutMode = 'grid' | 'focus' | 'horizontal' | 'vertical'
+export type ThemeMode = 'system' | 'light' | 'dark'
 
 export interface VideoItem {
   id: string
@@ -17,6 +18,7 @@ export interface VideoState {
   isModalOpen: boolean
   ytApiReady: boolean
   layoutMode: LayoutMode
+  themeMode: ThemeMode
 
   addVideo: (video: Omit<VideoItem, 'id' | 'isChatVisible' | 'isMuted'>) => void
   removeVideo: (id: string) => void
@@ -27,6 +29,7 @@ export interface VideoState {
   setModalOpen: (open: boolean) => void
   setWelcomeVisible: (visible: boolean) => void
   setLayoutMode: (mode: LayoutMode) => void
+  setThemeMode: (mode: ThemeMode) => void
   startViewing: () => void
   loadVideosFromUrl: (videos: Omit<VideoItem, 'id' | 'isChatVisible' | 'isMuted'>[]) => void
   reorderVideos: (activeId: string, overId: string) => void

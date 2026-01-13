@@ -13,10 +13,35 @@ function App() {
   const videos = useVideoStore((state) => state.videos)
   const setWelcomeVisible = useVideoStore((state) => state.setWelcomeVisible)
   const loadVideosFromUrl = useVideoStore((state) => state.loadVideosFromUrl)
+  const themeMode = useVideoStore((state) => state.themeMode)
   const hasLoadedFromUrl = useRef(false)
 
   // Load YouTube IFrame API
   useYouTubeAPI()
+
+  // Apply theme mode to document
+  useEffect(() => {
+    const root = document.documentElement
+
+    const applyTheme = (isDark: boolean) => {
+      if (isDark) {
+        root.classList.add('dark')
+      } else {
+        root.classList.remove('dark')
+      }
+    }
+
+    if (themeMode === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      applyTheme(mediaQuery.matches)
+
+      const handler = (e: MediaQueryListEvent) => applyTheme(e.matches)
+      mediaQuery.addEventListener('change', handler)
+      return () => mediaQuery.removeEventListener('change', handler)
+    } else {
+      applyTheme(themeMode === 'dark')
+    }
+  }, [themeMode])
 
   // Load videos from URL on initial mount
   useEffect(() => {
@@ -47,7 +72,7 @@ function App() {
   }, [videos.length, isWelcomeVisible, setWelcomeVisible])
 
   return (
-    <div className="min-h-screen bg-dark-bg text-gray-100">
+    <div className="min-h-screen bg-light-bg dark:bg-dark-bg text-gray-900 dark:text-gray-100">
       {isWelcomeVisible ? (
         <div className="flex items-center justify-center min-h-screen">
           <WelcomeScreen />

@@ -51,7 +51,7 @@ export const VideoItem = memo(function VideoItem({ video }: VideoItemProps) {
   }, [video.id, removeVideo])
 
   return (
-    <div className="flex gap-2 bg-dark-card rounded-lg overflow-hidden min-w-0 h-full">
+    <div className="flex gap-2 bg-light-card dark:bg-dark-card rounded-lg overflow-hidden min-w-0 h-full">
       <div className="flex flex-col flex-1 min-w-0">
         <div className="relative bg-black flex-1 min-w-0">
           <ErrorBoundary>

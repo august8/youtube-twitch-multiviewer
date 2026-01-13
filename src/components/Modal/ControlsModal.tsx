@@ -3,13 +3,19 @@ import { toast } from 'sonner'
 import { useVideoStore } from '@/stores/videoStore'
 import { parseVideoUrl, detectPlatform } from '@/utils/urlParser'
 import { getShareableUrl, copyToClipboard } from '@/utils/urlState'
-import type { LayoutMode } from '@/types/video'
+import type { LayoutMode, ThemeMode } from '@/types/video'
 
 const LAYOUT_OPTIONS: { mode: LayoutMode; label: string; icon: string }[] = [
   { mode: 'grid', label: 'グリッド', icon: '⊞' },
   { mode: 'focus', label: 'フォーカス', icon: '◧' },
   { mode: 'horizontal', label: '横並び', icon: '▭' },
   { mode: 'vertical', label: '縦並び', icon: '▯' },
+]
+
+const THEME_OPTIONS: { mode: ThemeMode; label: string; icon: string }[] = [
+  { mode: 'system', label: '自動', icon: '💻' },
+  { mode: 'light', label: 'ライト', icon: '☀️' },
+  { mode: 'dark', label: 'ダーク', icon: '🌙' },
 ]
 
 export function ControlsModal() {
@@ -20,6 +26,8 @@ export function ControlsModal() {
   const videos = useVideoStore((state) => state.videos)
   const layoutMode = useVideoStore((state) => state.layoutMode)
   const setLayoutMode = useVideoStore((state) => state.setLayoutMode)
+  const themeMode = useVideoStore((state) => state.themeMode)
+  const setThemeMode = useVideoStore((state) => state.setThemeMode)
 
   const [url, setUrl] = useState('')
   const [isLiveOverride, setIsLiveOverride] = useState<boolean | null>(null)
@@ -106,7 +114,7 @@ export function ControlsModal() {
       className="fixed inset-0 bg-black/80 flex items-center justify-center z-40"
       onClick={handleBackdropClick}
     >
-      <div className="bg-dark-card p-5 rounded-lg shadow-xl w-[90%] max-w-md flex flex-col gap-3">
+      <div className="bg-light-card dark:bg-dark-card p-5 rounded-lg shadow-xl w-[90%] max-w-md flex flex-col gap-3">
         <input
           type="text"
           value={url}
@@ -117,7 +125,7 @@ export function ControlsModal() {
         />
 
         {showLiveToggle && (
-          <label className="flex items-center gap-2 text-sm text-gray-300">
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             <input
               type="checkbox"
               checked={isLive}
@@ -158,8 +166,8 @@ export function ControlsModal() {
           </button>
         </div>
 
-        <div className="pt-3 border-t border-gray-700">
-          <div className="text-xs text-gray-400 mb-2">レイアウト</div>
+        <div className="pt-3 border-t border-gray-300 dark:border-gray-700">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">レイアウト</div>
           <div className="grid grid-cols-4 gap-1">
             {LAYOUT_OPTIONS.map((option) => (
               <button
@@ -168,7 +176,7 @@ export function ControlsModal() {
                 className={`py-2 px-1 rounded text-xs transition-colors ${
                   layoutMode === option.mode
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                 }`}
               >
                 <div className="text-lg">{option.icon}</div>
@@ -178,8 +186,28 @@ export function ControlsModal() {
           </div>
         </div>
 
-        <div className="text-center pt-3 border-t border-gray-700 text-xs text-gray-500">
-          v2.2.0 (React)
+        <div className="pt-3 border-t border-gray-300 dark:border-gray-700">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">テーマ</div>
+          <div className="grid grid-cols-3 gap-1">
+            {THEME_OPTIONS.map((option) => (
+              <button
+                key={option.mode}
+                onClick={() => setThemeMode(option.mode)}
+                className={`py-2 px-1 rounded text-xs transition-colors ${
+                  themeMode === option.mode
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
+              >
+                <div className="text-lg">{option.icon}</div>
+                <div>{option.label}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="text-center pt-3 border-t border-gray-300 dark:border-gray-700 text-xs text-gray-500">
+          v2.3.0 (React)
         </div>
       </div>
     </div>
