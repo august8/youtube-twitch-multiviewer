@@ -14,17 +14,7 @@
 | ESLint / Prettier | ✅ 完了 | eslint.config.js |
 | React.memo最適化 | ✅ 完了 | VideoItem, VideoControls, ControlsOverlay |
 | ダークモード/ライトモード | ✅ 完了 | システム連動 + 手動切り替え |
-
----
-
-## 未実装項目
-
-### 1. テストの追加
-- **概要**: ユニットテスト、コンポーネントテスト
-- **ライブラリ**: Vitest + React Testing Library
-- **対象**: urlParser、urlState、videoStore
-- **実装難易度**: 中
-- **優先度**: 中
+| テスト | ✅ 完了 | Vitest + React Testing Library (60テスト) |
 
 ---
 
