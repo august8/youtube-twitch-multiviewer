@@ -13,7 +13,7 @@ import { useGridLayout } from '@/hooks/useGridLayout'
 import { SortableVideoItem } from './SortableVideoItem'
 import type { LayoutMode } from '@/types/video'
 
-function getLayoutStyle(
+export function getLayoutStyle(
   layoutMode: LayoutMode,
   videoCount: number,
   cols: number,

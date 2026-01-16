@@ -6,15 +6,22 @@ interface TwitchPlayerProps {
   twitchType: 'channel' | 'vod'
 }
 
+export function buildTwitchEmbedUrl(
+  videoId: string,
+  twitchType: 'channel' | 'vod',
+  domain: string
+): string {
+  return twitchType === 'vod'
+    ? `https://player.twitch.tv/?video=${videoId}&parent=${domain}&autoplay=false`
+    : `https://player.twitch.tv/?channel=${videoId}&parent=${domain}`
+}
+
 export function TwitchPlayer({ videoId, twitchType }: TwitchPlayerProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const domain = window.location.hostname || 'localhost'
 
-  const src =
-    twitchType === 'vod'
-      ? `https://player.twitch.tv/?video=${videoId}&parent=${domain}&autoplay=false`
-      : `https://player.twitch.tv/?channel=${videoId}&parent=${domain}`
+  const src = buildTwitchEmbedUrl(videoId, twitchType, domain)
 
   const handleError = () => {
     setIsLoading(false)
