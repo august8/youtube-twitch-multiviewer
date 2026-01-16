@@ -7,7 +7,9 @@ export function FloatingButton() {
   return (
     <button
       onClick={() => setModalOpen(!isModalOpen)}
-      className="fixed bottom-5 right-5 w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xl flex items-center justify-center shadow-lg transition-colors z-50"
+      className="fixed bottom-5 right-5 w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xl flex items-center justify-center shadow-lg transition-colors z-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600"
+      aria-label={isModalOpen ? 'コントロールメニューを閉じる' : 'コントロールメニューを開く'}
+      aria-expanded={isModalOpen}
     >
       ☰
     </button>

@@ -130,38 +130,48 @@ export function ControlsModal() {
       className="fixed inset-0 bg-black/80 flex items-center justify-center z-40"
       onClick={handleBackdropClick}
     >
-      <div className="bg-light-card dark:bg-dark-card p-5 rounded-lg shadow-xl w-[90%] max-w-md flex flex-col gap-3">
+      <div
+        className="bg-light-card dark:bg-dark-card p-5 rounded-lg shadow-xl w-[90%] max-w-md flex flex-col gap-3"
+        role="dialog"
+        aria-modal="true"
+        aria-label="コントロールメニュー"
+      >
+        <label htmlFor="video-url-input" className="sr-only">
+          動画URL
+        </label>
         <input
+          id="video-url-input"
           type="text"
           value={url}
           onChange={handleUrlChange}
           onKeyPress={handleKeyPress}
           placeholder="YouTube または Twitch の URL を入力"
-          className="w-full px-3 py-2 rounded bg-white text-gray-900 text-sm"
+          className="w-full px-3 py-2 rounded bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
         {showLiveToggle && (
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             <input
+              id="live-toggle"
               type="checkbox"
               checked={isLive}
               onChange={(e) => setIsLiveOverride(e.target.checked)}
               className="w-4 h-4"
             />
-            ライブ配信（チャット機能を有効化）
-          </label>
+            <label htmlFor="live-toggle">ライブ配信（チャット機能を有効化）</label>
+          </div>
         )}
 
         <div className="flex gap-2">
           <button
             onClick={handleAdd}
-            className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+            className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
           >
             追加
           </button>
           <button
             onClick={handleReset}
-            className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+            className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
           >
             リセット
           </button>
@@ -170,13 +180,13 @@ export function ControlsModal() {
         <div className="flex gap-2">
           <button
             onClick={handleShare}
-            className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
+            className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
           >
             共有URLをコピー
           </button>
           <button
             onClick={handleClose}
-            className="flex-1 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors"
+            className="flex-1 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
           >
             閉じる
           </button>
@@ -184,18 +194,19 @@ export function ControlsModal() {
 
         <div className="pt-3 border-t border-gray-300 dark:border-gray-700">
           <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">レイアウト</div>
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-4 gap-1" role="group" aria-label="レイアウト選択">
             {LAYOUT_OPTIONS.map((option) => (
               <button
                 key={option.mode}
                 onClick={() => setLayoutMode(option.mode)}
-                className={`py-2 px-1 rounded text-xs transition-colors ${
+                className={`py-2 px-1 rounded text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 ${
                   layoutMode === option.mode
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                 }`}
+                aria-pressed={layoutMode === option.mode}
               >
-                <div className="text-lg">{option.icon}</div>
+                <div className="text-lg" aria-hidden="true">{option.icon}</div>
                 <div>{option.label}</div>
               </button>
             ))}
@@ -204,18 +215,19 @@ export function ControlsModal() {
 
         <div className="pt-3 border-t border-gray-300 dark:border-gray-700">
           <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">テーマ</div>
-          <div className="grid grid-cols-3 gap-1">
+          <div className="grid grid-cols-3 gap-1" role="group" aria-label="テーマ選択">
             {THEME_OPTIONS.map((option) => (
               <button
                 key={option.mode}
                 onClick={() => setThemeMode(option.mode)}
-                className={`py-2 px-1 rounded text-xs transition-colors ${
+                className={`py-2 px-1 rounded text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 ${
                   themeMode === option.mode
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                 }`}
+                aria-pressed={themeMode === option.mode}
               >
-                <div className="text-lg">{option.icon}</div>
+                <div className="text-lg" aria-hidden="true">{option.icon}</div>
                 <div>{option.label}</div>
               </button>
             ))}
