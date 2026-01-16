@@ -44,9 +44,25 @@ export function ControlsModal() {
   }, [])
 
   const handleAdd = useCallback(() => {
-    const parsed = parseVideoUrl(url.trim())
-    if (!parsed) {
+    const trimmedUrl = url.trim()
+    if (!trimmedUrl) {
+      toast.error('URLを入力してください')
+      return
+    }
+
+    const detectedPlatform = detectPlatform(trimmedUrl)
+    if (!detectedPlatform) {
       toast.error('YouTube または Twitch の URL を入力してください')
+      return
+    }
+
+    const parsed = parseVideoUrl(trimmedUrl)
+    if (!parsed) {
+      if (detectedPlatform === 'youtube') {
+        toast.error('YouTube の動画IDを取得できませんでした。URLを確認してください')
+      } else {
+        toast.error('Twitch のチャンネル/VOD情報を取得できませんでした。URLを確認してください')
+      }
       return
     }
 

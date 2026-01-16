@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react'
+import { toast } from 'sonner'
 import { useVideoStore } from '@/stores/videoStore'
 
 export interface YouTubePlayerHandle {
@@ -81,7 +82,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>
               101: '埋め込みが許可されていません',
               150: '埋め込みが許可されていません',
             }
-            alert(`動画の読み込みエラー: ${errorMessages[event.data] || `Code: ${event.data}`}`)
+            toast.error(`動画の読み込みエラー: ${errorMessages[event.data] || `Code: ${event.data}`}`)
           },
         },
       })
