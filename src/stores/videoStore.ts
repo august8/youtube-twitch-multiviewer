@@ -1,5 +1,10 @@
 import { create } from 'zustand'
-import type { VideoState } from '@/types/video'
+import type { VideoState, Locale } from '@/types/video'
+
+function getInitialLocale(): Locale {
+  const browserLang = navigator.language.toLowerCase()
+  return browserLang.startsWith('ja') ? 'ja' : 'en'
+}
 
 export const useVideoStore = create<VideoState>((set, get) => ({
   videos: [],
@@ -9,6 +14,7 @@ export const useVideoStore = create<VideoState>((set, get) => ({
   ytApiReady: false,
   layoutMode: 'grid',
   themeMode: 'system',
+  locale: getInitialLocale(),
 
   addVideo: (video) =>
     set((state) => {
@@ -64,6 +70,8 @@ export const useVideoStore = create<VideoState>((set, get) => ({
   setLayoutMode: (mode) => set({ layoutMode: mode }),
 
   setThemeMode: (mode) => set({ themeMode: mode }),
+
+  setLocale: (locale) => set({ locale }),
 
   startViewing: () => set({ isWelcomeVisible: false, isModalOpen: true }),
 

@@ -2,6 +2,7 @@ import { useRef, useState, useCallback, memo } from 'react'
 import { toast } from 'sonner'
 import type { VideoItem as VideoItemType } from '@/types/video'
 import { useVideoStore } from '@/stores/videoStore'
+import { useTranslation } from '@/i18n'
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import { TwitchPlayer } from './TwitchPlayer'
 import { YouTubePlayer, type YouTubePlayerHandle } from './YouTubePlayer'
@@ -17,6 +18,7 @@ export const VideoItem = memo(function VideoItem({ video }: VideoItemProps) {
   const removeVideo = useVideoStore((state) => state.removeVideo)
   const toggleChat = useVideoStore((state) => state.toggleChat)
   const toggleMute = useVideoStore((state) => state.toggleMute)
+  const t = useTranslation()
   const youtubePlayerRef = useRef<YouTubePlayerHandle>(null)
   const [currentTime, setCurrentTime] = useState(0)
 
@@ -41,14 +43,14 @@ export const VideoItem = memo(function VideoItem({ video }: VideoItemProps) {
     if (video.isLive) {
       toggleChat(video.id)
     } else {
-      toast.error('アーカイブ動画ではチャット機能は利用できません')
+      toast.error(t.toast.archiveChatUnavailable)
     }
-  }, [video.id, video.isLive, toggleChat])
+  }, [video.id, video.isLive, toggleChat, t])
 
   const handleDelete = useCallback(() => {
     removeVideo(video.id)
-    toast.success('動画を削除しました')
-  }, [video.id, removeVideo])
+    toast.success(t.toast.videoDeleted)
+  }, [video.id, removeVideo, t])
 
   return (
     <div className="flex gap-2 bg-light-card dark:bg-dark-card rounded-lg overflow-hidden min-w-0 h-full">

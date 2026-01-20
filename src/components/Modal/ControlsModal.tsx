@@ -1,21 +1,27 @@
 import { useState, useMemo, useCallback } from 'react'
 import { toast } from 'sonner'
 import { useVideoStore } from '@/stores/videoStore'
+import { useTranslation } from '@/i18n'
 import { parseVideoUrl, detectPlatform } from '@/utils/urlParser'
 import { getShareableUrl, copyToClipboard } from '@/utils/urlState'
-import type { LayoutMode, ThemeMode } from '@/types/video'
+import type { LayoutMode, ThemeMode, Locale } from '@/types/video'
 
-const LAYOUT_OPTIONS: { mode: LayoutMode; label: string; icon: string }[] = [
-  { mode: 'grid', label: 'グリッド', icon: '⊞' },
-  { mode: 'focus', label: 'フォーカス', icon: '◧' },
-  { mode: 'horizontal', label: '横並び', icon: '▭' },
-  { mode: 'vertical', label: '縦並び', icon: '▯' },
-]
+const LAYOUT_ICONS: Record<LayoutMode, string> = {
+  grid: '⊞',
+  focus: '◧',
+  horizontal: '▭',
+  vertical: '▯',
+}
 
-const THEME_OPTIONS: { mode: ThemeMode; label: string; icon: string }[] = [
-  { mode: 'system', label: '自動', icon: '💻' },
-  { mode: 'light', label: 'ライト', icon: '☀️' },
-  { mode: 'dark', label: 'ダーク', icon: '🌙' },
+const THEME_ICONS: Record<ThemeMode, string> = {
+  system: '💻',
+  light: '☀️',
+  dark: '🌙',
+}
+
+const LOCALE_OPTIONS: { mode: Locale; label: string; icon: string }[] = [
+  { mode: 'ja', label: '日本語', icon: '🇯🇵' },
+  { mode: 'en', label: 'English', icon: '🇺🇸' },
 ]
 
 export function ControlsModal() {
@@ -28,6 +34,9 @@ export function ControlsModal() {
   const setLayoutMode = useVideoStore((state) => state.setLayoutMode)
   const themeMode = useVideoStore((state) => state.themeMode)
   const setThemeMode = useVideoStore((state) => state.setThemeMode)
+  const locale = useVideoStore((state) => state.locale)
+  const setLocale = useVideoStore((state) => state.setLocale)
+  const t = useTranslation()
 
   const [url, setUrl] = useState('')
   const [isLiveOverride, setIsLiveOverride] = useState<boolean | null>(null)
@@ -38,6 +47,19 @@ export function ControlsModal() {
   const showLiveToggle = platform === 'youtube' || isTwitchVod
   const isLive = isLiveOverride ?? !isTwitchVod
 
+  const layoutOptions: { mode: LayoutMode; label: string; icon: string }[] = [
+    { mode: 'grid', label: t.controls.layouts.grid, icon: LAYOUT_ICONS.grid },
+    { mode: 'focus', label: t.controls.layouts.focus, icon: LAYOUT_ICONS.focus },
+    { mode: 'horizontal', label: t.controls.layouts.horizontal, icon: LAYOUT_ICONS.horizontal },
+    { mode: 'vertical', label: t.controls.layouts.vertical, icon: LAYOUT_ICONS.vertical },
+  ]
+
+  const themeOptions: { mode: ThemeMode; label: string; icon: string }[] = [
+    { mode: 'system', label: t.controls.themes.system, icon: THEME_ICONS.system },
+    { mode: 'light', label: t.controls.themes.light, icon: THEME_ICONS.light },
+    { mode: 'dark', label: t.controls.themes.dark, icon: THEME_ICONS.dark },
+  ]
+
   const handleUrlChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setUrl(e.target.value)
     setIsLiveOverride(null)
@@ -46,22 +68,22 @@ export function ControlsModal() {
   const handleAdd = useCallback(() => {
     const trimmedUrl = url.trim()
     if (!trimmedUrl) {
-      toast.error('URLを入力してください')
+      toast.error(t.toast.urlRequired)
       return
     }
 
     const detectedPlatform = detectPlatform(trimmedUrl)
     if (!detectedPlatform) {
-      toast.error('YouTube または Twitch の URL を入力してください')
+      toast.error(t.toast.invalidPlatform)
       return
     }
 
     const parsed = parseVideoUrl(trimmedUrl)
     if (!parsed) {
       if (detectedPlatform === 'youtube') {
-        toast.error('YouTube の動画IDを取得できませんでした。URLを確認してください')
+        toast.error(t.toast.youtubeIdError)
       } else {
-        toast.error('Twitch のチャンネル/VOD情報を取得できませんでした。URLを確認してください')
+        toast.error(t.toast.twitchIdError)
       }
       return
     }
@@ -72,34 +94,34 @@ export function ControlsModal() {
       twitchType: parsed.twitchType,
       isLive: parsed.platform === 'twitch' ? parsed.twitchType === 'channel' : isLive,
     })
-    toast.success('動画を追加しました')
+    toast.success(t.toast.videoAdded)
     setUrl('')
     setIsLiveOverride(null)
-  }, [url, isLive, addVideo])
+  }, [url, isLive, addVideo, t])
 
   const handleReset = useCallback(() => {
     if (videos.length === 0) {
-      toast.error('削除する動画がありません')
+      toast.error(t.toast.noVideosToDelete)
       return
     }
     resetVideos()
-    toast.success('全ての動画を削除しました')
-  }, [videos.length, resetVideos])
+    toast.success(t.toast.allVideosDeleted)
+  }, [videos.length, resetVideos, t])
 
   const handleShare = useCallback(async () => {
     if (videos.length === 0) {
-      toast.error('共有する動画がありません')
+      toast.error(t.toast.noVideosToShare)
       return
     }
 
     const shareUrl = getShareableUrl(videos)
     const success = await copyToClipboard(shareUrl)
     if (success) {
-      toast.success('URLをコピーしました！')
+      toast.success(t.toast.urlCopied)
     } else {
-      toast.error('コピーに失敗しました')
+      toast.error(t.toast.copyFailed)
     }
-  }, [videos])
+  }, [videos, t])
 
   const handleClose = useCallback(() => {
     setModalOpen(false)
@@ -134,18 +156,18 @@ export function ControlsModal() {
         className="bg-light-card dark:bg-dark-card p-5 rounded-lg shadow-xl w-[90%] max-w-md flex flex-col gap-3"
         role="dialog"
         aria-modal="true"
-        aria-label="コントロールメニュー"
+        aria-label={t.a11y.controlsMenu}
       >
         <label htmlFor="video-url-input" className="sr-only">
-          動画URL
+          {t.a11y.videoUrlInput}
         </label>
         <input
           id="video-url-input"
           type="text"
           value={url}
           onChange={handleUrlChange}
-          onKeyPress={handleKeyPress}
-          placeholder="YouTube または Twitch の URL を入力"
+          onKeyDown={handleKeyPress}
+          placeholder={t.controls.urlPlaceholder}
           className="w-full px-3 py-2 rounded bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
@@ -158,7 +180,7 @@ export function ControlsModal() {
               onChange={(e) => setIsLiveOverride(e.target.checked)}
               className="w-4 h-4"
             />
-            <label htmlFor="live-toggle">ライブ配信（チャット機能を有効化）</label>
+            <label htmlFor="live-toggle">{t.controls.liveToggle}</label>
           </div>
         )}
 
@@ -167,13 +189,13 @@ export function ControlsModal() {
             onClick={handleAdd}
             className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
           >
-            追加
+            {t.controls.addButton}
           </button>
           <button
             onClick={handleReset}
             className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
           >
-            リセット
+            {t.controls.resetButton}
           </button>
         </div>
 
@@ -182,20 +204,20 @@ export function ControlsModal() {
             onClick={handleShare}
             className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
           >
-            共有URLをコピー
+            {t.controls.shareButton}
           </button>
           <button
             onClick={handleClose}
             className="flex-1 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
           >
-            閉じる
+            {t.controls.closeButton}
           </button>
         </div>
 
         <div className="pt-3 border-t border-gray-300 dark:border-gray-700">
-          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">レイアウト</div>
-          <div className="grid grid-cols-4 gap-1" role="group" aria-label="レイアウト選択">
-            {LAYOUT_OPTIONS.map((option) => (
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t.controls.layoutLabel}</div>
+          <div className="grid grid-cols-4 gap-1" role="group" aria-label={t.a11y.layoutSelection}>
+            {layoutOptions.map((option) => (
               <button
                 key={option.mode}
                 onClick={() => setLayoutMode(option.mode)}
@@ -214,9 +236,9 @@ export function ControlsModal() {
         </div>
 
         <div className="pt-3 border-t border-gray-300 dark:border-gray-700">
-          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">テーマ</div>
-          <div className="grid grid-cols-3 gap-1" role="group" aria-label="テーマ選択">
-            {THEME_OPTIONS.map((option) => (
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t.controls.themeLabel}</div>
+          <div className="grid grid-cols-3 gap-1" role="group" aria-label={t.a11y.themeSelection}>
+            {themeOptions.map((option) => (
               <button
                 key={option.mode}
                 onClick={() => setThemeMode(option.mode)}
@@ -234,8 +256,29 @@ export function ControlsModal() {
           </div>
         </div>
 
+        <div className="pt-3 border-t border-gray-300 dark:border-gray-700">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t.controls.language}</div>
+          <div className="grid grid-cols-2 gap-1" role="group" aria-label={t.a11y.languageSelection}>
+            {LOCALE_OPTIONS.map((option) => (
+              <button
+                key={option.mode}
+                onClick={() => setLocale(option.mode)}
+                className={`py-2 px-1 rounded text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                  locale === option.mode
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
+                aria-pressed={locale === option.mode}
+              >
+                <div className="text-lg" aria-hidden="true">{option.icon}</div>
+                <div>{option.label}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="text-center pt-3 border-t border-gray-300 dark:border-gray-700 text-xs text-gray-500">
-          v2.3.0 (React)
+          v{__APP_VERSION__} (React)
         </div>
       </div>
     </div>
