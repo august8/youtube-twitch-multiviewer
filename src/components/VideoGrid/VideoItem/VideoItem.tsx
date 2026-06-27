@@ -7,7 +7,6 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import { TwitchPlayer } from './TwitchPlayer'
 import { YouTubePlayer, type YouTubePlayerHandle } from './YouTubePlayer'
 import { VideoControls } from './VideoControls'
-import { ControlsOverlay } from './ControlsOverlay'
 import { ChatPanel } from './ChatPanel'
 import { SlotHeader } from './SlotHeader'
 
@@ -59,65 +58,53 @@ export const VideoItem = memo(function VideoItem({ video }: VideoItemProps) {
   }, [video.id, removeVideo, t])
 
   const showChat = video.isChatVisible && video.isLive
-  const showVideo = video.isVideoVisible
 
   return (
     <div className="flex flex-col bg-light-card dark:bg-dark-card rounded-lg overflow-hidden min-w-0 h-full">
       <SlotHeader
+        platform={video.platform}
         isVideoVisible={video.isVideoVisible}
+        isMuted={video.isMuted}
         isChatVisible={video.isChatVisible}
         isLive={video.isLive}
         onVideoToggle={handleVideoToggle}
+        onMuteToggle={handleMuteToggle}
         onChatToggle={handleChatToggle}
         onDelete={handleDelete}
       />
 
       <div className="flex gap-2 flex-1 min-h-0">
-        {showVideo && (
-          <div className="flex flex-col flex-1 min-w-0">
-            <div className="relative bg-black flex-1 min-w-0">
-              <ErrorBoundary>
-                {video.platform === 'twitch' ? (
-                  <TwitchPlayer
-                    videoId={video.videoId}
-                    twitchType={video.twitchType || 'channel'}
-                  />
-                ) : (
-                  <YouTubePlayer
-                    ref={youtubePlayerRef}
-                    videoId={video.videoId}
-                    onTimeUpdate={handleTimeUpdate}
-                  />
-                )}
-              </ErrorBoundary>
-
-              <ControlsOverlay
-                platform={video.platform}
-                isMuted={video.isMuted}
-                onMuteToggle={handleMuteToggle}
-              />
-            </div>
-
-            {video.platform === 'youtube' && (
-              <VideoControls currentTime={currentTime} onSeek={handleSeek} />
-            )}
+        <div className={`flex flex-col flex-1 min-w-0 ${video.isVideoVisible ? '' : 'hidden'}`}>
+          <div className="relative bg-black flex-1 min-w-0">
+            <ErrorBoundary>
+              {video.platform === 'twitch' ? (
+                <TwitchPlayer
+                  videoId={video.videoId}
+                  twitchType={video.twitchType || 'channel'}
+                />
+              ) : (
+                <YouTubePlayer
+                  ref={youtubePlayerRef}
+                  videoId={video.videoId}
+                  onTimeUpdate={handleTimeUpdate}
+                />
+              )}
+            </ErrorBoundary>
           </div>
-        )}
+
+          {video.platform === 'youtube' && (
+            <VideoControls currentTime={currentTime} onSeek={handleSeek} />
+          )}
+        </div>
 
         {showChat && (
-          <div className={showVideo ? '' : 'flex-1 min-w-0'}>
+          <div className={video.isVideoVisible ? '' : 'flex-1 min-w-0'}>
             <ChatPanel
               platform={video.platform}
               videoId={video.videoId}
               twitchType={video.twitchType}
-              fillWidth={!showVideo}
+              fillWidth={!video.isVideoVisible}
             />
-          </div>
-        )}
-
-        {!showVideo && !showChat && (
-          <div className="flex-1 flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 p-4 text-center">
-            動画とチャットがどちらも非表示です。上のボタンから表示できます。
           </div>
         )}
       </div>
