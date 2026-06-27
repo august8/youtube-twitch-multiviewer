@@ -6,11 +6,17 @@ import { WelcomeScreen } from '@/components/WelcomeScreen/WelcomeScreen'
 import { VideoGrid } from '@/components/VideoGrid/VideoGrid'
 import { ControlsModal } from '@/components/Modal/ControlsModal'
 import { FloatingButton } from '@/components/Modal/FloatingButton'
-import { getVideosFromCurrentUrl } from '@/utils/urlState'
+import {
+  getVideosFromCurrentUrl,
+  loadVideosFromStorage,
+  saveVideosToStorage,
+  syncVideosToUrl,
+} from '@/utils/urlState'
 
 function App() {
   const isWelcomeVisible = useVideoStore((state) => state.isWelcomeVisible)
   const videos = useVideoStore((state) => state.videos)
+  const videoOrder = useVideoStore((state) => state.videoOrder)
   const setWelcomeVisible = useVideoStore((state) => state.setWelcomeVisible)
   const loadVideosFromUrl = useVideoStore((state) => state.loadVideosFromUrl)
   const themeMode = useVideoStore((state) => state.themeMode)
@@ -43,18 +49,30 @@ function App() {
     }
   }, [themeMode])
 
-  // Load videos from URL on initial mount
+  // Load videos from URL on initial mount, falling back to localStorage backup
   useEffect(() => {
     if (hasLoadedFromUrl.current) return
     hasLoadedFromUrl.current = true
 
     const videosFromUrl = getVideosFromCurrentUrl()
-    console.log('URL params check:', window.location.search)
-    console.log('Videos from URL:', videosFromUrl)
     if (videosFromUrl.length > 0) {
       loadVideosFromUrl(videosFromUrl)
+      return
+    }
+    const videosFromStorage = loadVideosFromStorage()
+    if (videosFromStorage.length > 0) {
+      loadVideosFromUrl(videosFromStorage)
     }
   }, [loadVideosFromUrl])
+
+  // Mirror video state to URL (?v=...) and localStorage so back-nav / reload
+  // can recover after misclicks. Skipped until the initial load has run.
+  useEffect(() => {
+    if (!hasLoadedFromUrl.current) return
+    const ordered = useVideoStore.getState().getOrderedVideos()
+    syncVideosToUrl(ordered)
+    saveVideosToStorage(ordered)
+  }, [videos, videoOrder])
 
   // Return to welcome screen when all videos are removed
   // Only trigger when videos become empty (not when starting fresh)

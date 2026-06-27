@@ -1,6 +1,36 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { encodeVideosToUrl, decodeVideosFromUrl, getShareableUrl } from './urlState'
+import {
+  encodeVideosToUrl,
+  decodeVideosFromUrl,
+  getShareableUrl,
+  syncVideosToUrl,
+  saveVideosToStorage,
+  loadVideosFromStorage,
+  clearVideosFromStorage,
+} from './urlState'
 import type { VideoItem } from '@/types/video'
+
+const STORAGE_KEY = 'multiviewer:videos'
+
+const sampleVideos: VideoItem[] = [
+  {
+    id: '1',
+    videoId: 'abc123',
+    platform: 'youtube',
+    isLive: true,
+    isChatVisible: false,
+    isMuted: false,
+  },
+  {
+    id: '2',
+    videoId: 'streamer',
+    platform: 'twitch',
+    twitchType: 'channel',
+    isLive: true,
+    isChatVisible: false,
+    isMuted: false,
+  },
+]
 
 describe('encodeVideosToUrl', () => {
   it('should encode YouTube live video', () => {
@@ -184,6 +214,72 @@ describe('getShareableUrl', () => {
   it('should return base URL for empty videos', () => {
     const url = getShareableUrl([])
     expect(url).toBe('http://localhost:3000/')
+  })
+})
+
+describe('saveVideosToStorage / loadVideosFromStorage', () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals()
+    window.localStorage.clear()
+  })
+
+  it('should roundtrip videos through localStorage', () => {
+    saveVideosToStorage(sampleVideos)
+    const loaded = loadVideosFromStorage()
+    expect(loaded).toHaveLength(2)
+    expect(loaded[0].videoId).toBe('abc123')
+    expect(loaded[0].platform).toBe('youtube')
+    expect(loaded[1].videoId).toBe('streamer')
+    expect(loaded[1].twitchType).toBe('channel')
+  })
+
+  it('should remove storage key when saving empty array', () => {
+    window.localStorage.setItem(STORAGE_KEY, 'yt:abc:L')
+    saveVideosToStorage([])
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull()
+  })
+
+  it('should return empty array when no data stored', () => {
+    expect(loadVideosFromStorage()).toEqual([])
+  })
+
+  it('should return empty array for malformed stored data', () => {
+    window.localStorage.setItem(STORAGE_KEY, 'totally-broken-payload')
+    expect(loadVideosFromStorage()).toEqual([])
+  })
+
+  it('clearVideosFromStorage removes the key', () => {
+    saveVideosToStorage(sampleVideos)
+    expect(window.localStorage.getItem(STORAGE_KEY)).not.toBeNull()
+    clearVideosFromStorage()
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull()
+  })
+})
+
+describe('syncVideosToUrl', () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals()
+    window.history.replaceState(null, '', 'http://localhost:3000/')
+  })
+
+  it('should write ?v=... to the current URL', () => {
+    syncVideosToUrl(sampleVideos)
+    const params = new URLSearchParams(window.location.search)
+    expect(params.get('v')).toBe('yt:abc123:L,tw:streamer:c')
+  })
+
+  it('should remove ?v param when given empty array', () => {
+    window.history.replaceState(null, '', 'http://localhost:3000/?v=yt:abc:L')
+    syncVideosToUrl([])
+    expect(new URLSearchParams(window.location.search).get('v')).toBeNull()
+  })
+
+  it('should preserve other query parameters', () => {
+    window.history.replaceState(null, '', 'http://localhost:3000/?lang=ja')
+    syncVideosToUrl(sampleVideos)
+    const params = new URLSearchParams(window.location.search)
+    expect(params.get('lang')).toBe('ja')
+    expect(params.get('v')).toBe('yt:abc123:L,tw:streamer:c')
   })
 })
 

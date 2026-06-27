@@ -2,6 +2,8 @@ import type { VideoItem } from '@/types/video'
 
 type VideoData = Omit<VideoItem, 'id' | 'isChatVisible' | 'isMuted'>
 
+const STORAGE_KEY = 'multiviewer:videos'
+
 /**
  * Encode videos to URL query parameter
  * Format: platform:videoId:type (comma separated)
@@ -77,6 +79,61 @@ export function getVideosFromCurrentUrl(): VideoData[] {
   const params = new URLSearchParams(window.location.search)
   const videoParam = params.get('v')
   return videoParam ? decodeVideosFromUrl(videoParam) : []
+}
+
+/**
+ * Replace the current URL's `v` query param to mirror the given videos.
+ * Uses history.replaceState so navigation history is not polluted.
+ */
+export function syncVideosToUrl(videos: VideoItem[]): void {
+  const url = new URL(window.location.href)
+  const encoded = encodeVideosToUrl(videos)
+  if (encoded) {
+    url.searchParams.set('v', encoded)
+  } else {
+    url.searchParams.delete('v')
+  }
+  window.history.replaceState(null, '', url.toString())
+}
+
+/**
+ * Persist videos to localStorage as a backup against history navigation loss.
+ * Empty arrays remove the key so stale data does not resurface.
+ */
+export function saveVideosToStorage(videos: VideoItem[]): void {
+  try {
+    const encoded = encodeVideosToUrl(videos)
+    if (encoded) {
+      window.localStorage.setItem(STORAGE_KEY, encoded)
+    } else {
+      window.localStorage.removeItem(STORAGE_KEY)
+    }
+  } catch {
+    // localStorage may be unavailable (private mode, quota) — ignore silently
+  }
+}
+
+/**
+ * Load videos previously saved to localStorage.
+ */
+export function loadVideosFromStorage(): VideoData[] {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY)
+    return stored ? decodeVideosFromUrl(stored) : []
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Remove persisted videos from localStorage.
+ */
+export function clearVideosFromStorage(): void {
+  try {
+    window.localStorage.removeItem(STORAGE_KEY)
+  } catch {
+    // ignore
+  }
 }
 
 /**
