@@ -57,9 +57,38 @@ export function getLayoutStyle(
       const mainVideo = orderedVideos.find((v) => v.id === mainVideoId) ?? orderedVideos[0]
       const subVideos = orderedVideos.filter((v) => v.id !== mainVideo.id)
       const mainHidden = !mainVideo.isVideoVisible
+
+      // Single-sub case: main spans the only sub row, so shrinking that row also
+      // shrinks main vertically. Optimize via column widths instead.
+      if (subVideos.length === 1) {
+        const sub = subVideos[0]
+        const subHidden = !sub.isVideoVisible
+        const subSize = getSlotTrackSize(sub)
+        let colTracks: string
+        if (mainHidden && subHidden) {
+          colTracks = 'auto auto'
+        } else if (mainHidden) {
+          colTracks = 'auto 1fr'
+        } else if (subHidden) {
+          colTracks = `1fr ${subSize}`
+        } else {
+          colTracks = '7fr 3fr'
+        }
+        return { gridTemplateColumns: colTracks, gridTemplateRows: '1fr' }
+      }
+
+      // Multi-sub case: shrink rows per visibility, but ensure at least one row
+      // is 1fr (otherwise main spanning all rows collapses to content height).
+      const subSizes = subVideos.map(getSlotTrackSize)
+      const hasOneFr = subSizes.some((s) => s === '1fr')
+      const rowTracks =
+        !hasOneFr || subSizes.every((s) => s === '1fr')
+          ? `repeat(${subVideos.length}, 1fr)`
+          : subSizes.join(' ')
+
       return {
         gridTemplateColumns: mainHidden ? 'auto 1fr' : '7fr 3fr',
-        gridTemplateRows: buildTracks(subVideos),
+        gridTemplateRows: rowTracks,
       }
     }
     case 'grid':

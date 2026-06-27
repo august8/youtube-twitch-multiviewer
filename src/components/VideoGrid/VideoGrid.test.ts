@@ -119,7 +119,7 @@ describe('getLayoutStyle', () => {
       expect(style.gridTemplateRows).toBe('repeat(4, 1fr)')
     })
 
-    it('should shrink main column when main video is hidden', () => {
+    it('should shrink main column when main video is hidden (multi-sub)', () => {
       const videos = [
         makeVideo({ id: 'main', isVideoVisible: false }),
         makeVideo({ id: 'sub1' }),
@@ -130,7 +130,7 @@ describe('getLayoutStyle', () => {
       expect(style.gridTemplateRows).toBe('repeat(2, 1fr)')
     })
 
-    it('should shrink sub row when sub video is hidden', () => {
+    it('should shrink sub row when one of multiple subs is hidden', () => {
       const videos = [
         makeVideo({ id: 'main' }),
         makeVideo({ id: 'sub1', isVideoVisible: false, isChatVisible: true }),
@@ -139,6 +139,64 @@ describe('getLayoutStyle', () => {
       const style = getLayoutStyle('focus', videos, 2, 2, 'main')
       expect(style.gridTemplateColumns).toBe('7fr 3fr')
       expect(style.gridTemplateRows).toBe('0.5fr 1fr')
+    })
+
+    it('should fall back to repeat rows when all subs are hidden (multi-sub)', () => {
+      const videos = [
+        makeVideo({ id: 'main' }),
+        makeVideo({ id: 'sub1', isVideoVisible: false, isChatVisible: true }),
+        makeVideo({ id: 'sub2', isVideoVisible: false, isChatVisible: false }),
+      ]
+      const style = getLayoutStyle('focus', videos, 2, 2, 'main')
+      expect(style.gridTemplateColumns).toBe('7fr 3fr')
+      expect(style.gridTemplateRows).toBe('repeat(2, 1fr)')
+    })
+
+    it('should shrink sub COLUMN (not row) when single sub is hidden+chat', () => {
+      const videos = [
+        makeVideo({ id: 'main' }),
+        makeVideo({ id: 'sub', isVideoVisible: false, isChatVisible: true }),
+      ]
+      const style = getLayoutStyle('focus', videos, 1, 1, 'main')
+      expect(style.gridTemplateColumns).toBe('1fr 0.5fr')
+      expect(style.gridTemplateRows).toBe('1fr')
+    })
+
+    it('should shrink sub COLUMN to auto when single sub is fully hidden', () => {
+      const videos = [
+        makeVideo({ id: 'main' }),
+        makeVideo({ id: 'sub', isVideoVisible: false, isChatVisible: false }),
+      ]
+      const style = getLayoutStyle('focus', videos, 1, 1, 'main')
+      expect(style.gridTemplateColumns).toBe('1fr auto')
+      expect(style.gridTemplateRows).toBe('1fr')
+    })
+
+    it('should shrink main column when single sub case with main hidden', () => {
+      const videos = [
+        makeVideo({ id: 'main', isVideoVisible: false }),
+        makeVideo({ id: 'sub' }),
+      ]
+      const style = getLayoutStyle('focus', videos, 1, 1, 'main')
+      expect(style.gridTemplateColumns).toBe('auto 1fr')
+      expect(style.gridTemplateRows).toBe('1fr')
+    })
+
+    it('should collapse both columns when single sub case with both hidden', () => {
+      const videos = [
+        makeVideo({ id: 'main', isVideoVisible: false }),
+        makeVideo({ id: 'sub', isVideoVisible: false, isChatVisible: false }),
+      ]
+      const style = getLayoutStyle('focus', videos, 1, 1, 'main')
+      expect(style.gridTemplateColumns).toBe('auto auto')
+      expect(style.gridTemplateRows).toBe('1fr')
+    })
+
+    it('should use default 7fr 3fr when single sub is fully visible', () => {
+      const videos = [makeVideo({ id: 'main' }), makeVideo({ id: 'sub' })]
+      const style = getLayoutStyle('focus', videos, 1, 1, 'main')
+      expect(style.gridTemplateColumns).toBe('7fr 3fr')
+      expect(style.gridTemplateRows).toBe('1fr')
     })
   })
 
