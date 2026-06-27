@@ -38,6 +38,7 @@ interface TranslationSchema {
       dark: string
     }
     language: string
+    chatOnlyWidthLabel: string
   }
   toast: {
     urlRequired: string
@@ -111,6 +112,7 @@ export const translations: Record<Locale, TranslationSchema> = {
         dark: 'ダーク',
       },
       language: '言語',
+      chatOnlyWidthLabel: 'チャットのみスロットの幅 (px)',
     },
     // Toast Messages
     toast: {
@@ -187,6 +189,7 @@ export const translations: Record<Locale, TranslationSchema> = {
         dark: 'Dark',
       },
       language: 'Language',
+      chatOnlyWidthLabel: 'Chat-only slot width (px)',
     },
     // Toast Messages
     toast: {

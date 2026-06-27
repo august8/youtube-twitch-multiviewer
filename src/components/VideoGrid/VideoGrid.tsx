@@ -13,18 +13,18 @@ import { useGridLayout } from '@/hooks/useGridLayout'
 import { SortableVideoItem } from './SortableVideoItem'
 import type { LayoutMode, VideoItem } from '@/types/video'
 
-const HIDDEN_WITH_CHAT_TRACK = '0.5fr'
 const HIDDEN_NO_CHAT_TRACK = 'auto'
+const DEFAULT_CHAT_ONLY_TRACK = '300px'
 
-function getSlotTrackSize(video: VideoItem): string {
+function getSlotTrackSize(video: VideoItem, chatOnlyTrack: string): string {
   if (video.isVideoVisible) return '1fr'
-  if (video.isChatVisible && video.isLive) return HIDDEN_WITH_CHAT_TRACK
+  if (video.isChatVisible && video.isLive) return chatOnlyTrack
   return HIDDEN_NO_CHAT_TRACK
 }
 
-function buildTracks(videos: VideoItem[]): string {
+function buildTracks(videos: VideoItem[], chatOnlyTrack: string): string {
   if (videos.length === 0) return '1fr'
-  const sizes = videos.map(getSlotTrackSize)
+  const sizes = videos.map((v) => getSlotTrackSize(v, chatOnlyTrack))
   return sizes.every((s) => s === '1fr') ? `repeat(${sizes.length}, 1fr)` : sizes.join(' ')
 }
 
@@ -33,19 +33,20 @@ export function getLayoutStyle(
   orderedVideos: VideoItem[],
   cols: number,
   rows: number,
-  mainVideoId?: string | null
+  mainVideoId?: string | null,
+  chatOnlyTrack: string = DEFAULT_CHAT_ONLY_TRACK
 ): React.CSSProperties {
   const videoCount = orderedVideos.length
   switch (layoutMode) {
     case 'horizontal':
       return {
-        gridTemplateColumns: buildTracks(orderedVideos),
+        gridTemplateColumns: buildTracks(orderedVideos, chatOnlyTrack),
         gridTemplateRows: '1fr',
       }
     case 'vertical':
       return {
         gridTemplateColumns: '1fr',
-        gridTemplateRows: buildTracks(orderedVideos),
+        gridTemplateRows: buildTracks(orderedVideos, chatOnlyTrack),
       }
     case 'focus': {
       if (videoCount <= 1) {
@@ -63,7 +64,7 @@ export function getLayoutStyle(
       if (subVideos.length === 1) {
         const sub = subVideos[0]
         const subHidden = !sub.isVideoVisible
-        const subSize = getSlotTrackSize(sub)
+        const subSize = getSlotTrackSize(sub, chatOnlyTrack)
         let colTracks: string
         if (mainHidden && subHidden) {
           colTracks = 'auto auto'
@@ -79,7 +80,7 @@ export function getLayoutStyle(
 
       // Multi-sub case: shrink rows per visibility, but ensure at least one row
       // is 1fr (otherwise main spanning all rows collapses to content height).
-      const subSizes = subVideos.map(getSlotTrackSize)
+      const subSizes = subVideos.map((v) => getSlotTrackSize(v, chatOnlyTrack))
       const hasOneFr = subSizes.some((s) => s === '1fr')
       const rowTracks =
         !hasOneFr || subSizes.every((s) => s === '1fr')
@@ -104,6 +105,7 @@ export function VideoGrid() {
   const videos = useVideoStore((state) => state.videos)
   const videoOrder = useVideoStore((state) => state.videoOrder)
   const layoutMode = useVideoStore((state) => state.layoutMode)
+  const chatOnlySlotWidth = useVideoStore((state) => state.chatOnlySlotWidth)
   const reorderVideos = useVideoStore((state) => state.reorderVideos)
   const getOrderedVideos = useVideoStore((state) => state.getOrderedVideos)
   const { cols, rows } = useGridLayout(videos.length)
@@ -135,8 +137,16 @@ export function VideoGrid() {
   }, [orderedVideos])
 
   const layoutStyle = useMemo(
-    () => getLayoutStyle(layoutMode, orderedVideos, cols, rows, mainVideoId),
-    [layoutMode, orderedVideos, cols, rows, mainVideoId]
+    () =>
+      getLayoutStyle(
+        layoutMode,
+        orderedVideos,
+        cols,
+        rows,
+        mainVideoId,
+        `${chatOnlySlotWidth}px`
+      ),
+    [layoutMode, orderedVideos, cols, rows, mainVideoId, chatOnlySlotWidth]
   )
 
   const sortedVideoIds = useMemo(() => orderedVideos.map((v) => v.id), [orderedVideos])

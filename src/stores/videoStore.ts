@@ -15,6 +15,7 @@ export const useVideoStore = create<VideoState>((set, get) => ({
   layoutMode: 'grid',
   themeMode: 'system',
   locale: getInitialLocale(),
+  chatOnlySlotWidth: 300,
 
   addVideo: (video) =>
     set((state) => {
@@ -80,6 +81,8 @@ export const useVideoStore = create<VideoState>((set, get) => ({
   setThemeMode: (mode) => set({ themeMode: mode }),
 
   setLocale: (locale) => set({ locale }),
+
+  setChatOnlySlotWidth: (width) => set({ chatOnlySlotWidth: width }),
 
   startViewing: () => set({ isWelcomeVisible: false, isModalOpen: true }),
 

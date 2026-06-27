@@ -33,14 +33,24 @@ describe('getLayoutStyle', () => {
       expect(style.gridTemplateRows).toBe('1fr')
     })
 
-    it('should shrink chat-only slot to 0.5fr', () => {
+    it('should shrink chat-only slot to default 300px', () => {
       const videos = [
         makeVideo({ id: 'a' }),
         makeVideo({ id: 'b', isVideoVisible: false, isChatVisible: true }),
         makeVideo({ id: 'c' }),
       ]
       const style = getLayoutStyle('horizontal', videos, 2, 2)
-      expect(style.gridTemplateColumns).toBe('1fr 0.5fr 1fr')
+      expect(style.gridTemplateColumns).toBe('1fr 300px 1fr')
+    })
+
+    it('should respect custom chatOnlyTrack value', () => {
+      const videos = [
+        makeVideo({ id: 'a' }),
+        makeVideo({ id: 'b', isVideoVisible: false, isChatVisible: true }),
+        makeVideo({ id: 'c' }),
+      ]
+      const style = getLayoutStyle('horizontal', videos, 2, 2, undefined, '240px')
+      expect(style.gridTemplateColumns).toBe('1fr 240px 1fr')
     })
 
     it('should collapse fully hidden slot to auto', () => {
@@ -88,7 +98,7 @@ describe('getLayoutStyle', () => {
         makeVideo({ id: 'c', isVideoVisible: false, isChatVisible: false }),
       ]
       const style = getLayoutStyle('vertical', videos, 2, 2)
-      expect(style.gridTemplateRows).toBe('1fr 0.5fr auto')
+      expect(style.gridTemplateRows).toBe('1fr 300px auto')
     })
   })
 
@@ -138,7 +148,7 @@ describe('getLayoutStyle', () => {
       ]
       const style = getLayoutStyle('focus', videos, 2, 2, 'main')
       expect(style.gridTemplateColumns).toBe('7fr 3fr')
-      expect(style.gridTemplateRows).toBe('0.5fr 1fr')
+      expect(style.gridTemplateRows).toBe('300px 1fr')
     })
 
     it('should fall back to repeat rows when all subs are hidden (multi-sub)', () => {
@@ -158,7 +168,7 @@ describe('getLayoutStyle', () => {
         makeVideo({ id: 'sub', isVideoVisible: false, isChatVisible: true }),
       ]
       const style = getLayoutStyle('focus', videos, 1, 1, 'main')
-      expect(style.gridTemplateColumns).toBe('1fr 0.5fr')
+      expect(style.gridTemplateColumns).toBe('1fr 300px')
       expect(style.gridTemplateRows).toBe('1fr')
     })
 

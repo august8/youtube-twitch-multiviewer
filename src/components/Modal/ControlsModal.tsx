@@ -36,6 +36,8 @@ export function ControlsModal() {
   const setThemeMode = useVideoStore((state) => state.setThemeMode)
   const locale = useVideoStore((state) => state.locale)
   const setLocale = useVideoStore((state) => state.setLocale)
+  const chatOnlySlotWidth = useVideoStore((state) => state.chatOnlySlotWidth)
+  const setChatOnlySlotWidth = useVideoStore((state) => state.setChatOnlySlotWidth)
   const t = useTranslation()
 
   const [url, setUrl] = useState('')
@@ -143,6 +145,16 @@ export function ControlsModal() {
       }
     },
     [handleAdd]
+  )
+
+  const handleChatWidthChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const parsed = parseInt(e.target.value, 10)
+      if (Number.isNaN(parsed)) return
+      const clamped = Math.max(200, Math.min(800, parsed))
+      setChatOnlySlotWidth(clamped)
+    },
+    [setChatOnlySlotWidth]
   )
 
   if (!isModalOpen) return null
@@ -254,6 +266,25 @@ export function ControlsModal() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="pt-3 border-t border-gray-300 dark:border-gray-700">
+          <label
+            htmlFor="chat-only-width-input"
+            className="text-xs text-gray-500 dark:text-gray-400 mb-2 block"
+          >
+            {t.controls.chatOnlyWidthLabel}
+          </label>
+          <input
+            id="chat-only-width-input"
+            type="number"
+            min={200}
+            max={800}
+            step={10}
+            value={chatOnlySlotWidth}
+            onChange={handleChatWidthChange}
+            className="w-full px-3 py-2 rounded bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
         <div className="pt-3 border-t border-gray-300 dark:border-gray-700">

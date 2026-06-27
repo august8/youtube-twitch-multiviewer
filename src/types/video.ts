@@ -22,6 +22,7 @@ export interface VideoState {
   layoutMode: LayoutMode
   themeMode: ThemeMode
   locale: Locale
+  chatOnlySlotWidth: number
 
   addVideo: (video: Omit<VideoItem, 'id' | 'isChatVisible' | 'isVideoVisible' | 'isMuted'>) => void
   removeVideo: (id: string) => void
@@ -35,6 +36,7 @@ export interface VideoState {
   setLayoutMode: (mode: LayoutMode) => void
   setThemeMode: (mode: ThemeMode) => void
   setLocale: (locale: Locale) => void
+  setChatOnlySlotWidth: (width: number) => void
   startViewing: () => void
   loadVideosFromUrl: (
     videos: Omit<VideoItem, 'id' | 'isChatVisible' | 'isVideoVisible' | 'isMuted'>[]
