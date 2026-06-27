@@ -1,6 +1,6 @@
 import type { VideoItem } from '@/types/video'
 
-type VideoData = Omit<VideoItem, 'id' | 'isChatVisible' | 'isMuted'>
+type VideoData = Omit<VideoItem, 'id' | 'isChatVisible' | 'isVideoVisible' | 'isMuted'>
 
 const STORAGE_KEY = 'multiviewer:videos'
 

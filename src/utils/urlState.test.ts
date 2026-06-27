@@ -19,6 +19,7 @@ const sampleVideos: VideoItem[] = [
     platform: 'youtube',
     isLive: true,
     isChatVisible: false,
+    isVideoVisible: true,
     isMuted: false,
   },
   {
@@ -28,6 +29,7 @@ const sampleVideos: VideoItem[] = [
     twitchType: 'channel',
     isLive: true,
     isChatVisible: false,
+    isVideoVisible: true,
     isMuted: false,
   },
 ]
@@ -41,6 +43,7 @@ describe('encodeVideosToUrl', () => {
         platform: 'youtube',
         isLive: true,
         isChatVisible: false,
+        isVideoVisible: true,
         isMuted: false,
       },
     ]
@@ -55,6 +58,7 @@ describe('encodeVideosToUrl', () => {
         platform: 'youtube',
         isLive: false,
         isChatVisible: false,
+        isVideoVisible: true,
         isMuted: false,
       },
     ]
@@ -70,6 +74,7 @@ describe('encodeVideosToUrl', () => {
         twitchType: 'channel',
         isLive: true,
         isChatVisible: false,
+        isVideoVisible: true,
         isMuted: false,
       },
     ]
@@ -85,6 +90,7 @@ describe('encodeVideosToUrl', () => {
         twitchType: 'vod',
         isLive: false,
         isChatVisible: false,
+        isVideoVisible: true,
         isMuted: false,
       },
     ]
@@ -99,6 +105,7 @@ describe('encodeVideosToUrl', () => {
         platform: 'youtube',
         isLive: true,
         isChatVisible: false,
+        isVideoVisible: true,
         isMuted: false,
       },
       {
@@ -108,6 +115,7 @@ describe('encodeVideosToUrl', () => {
         twitchType: 'channel',
         isLive: true,
         isChatVisible: false,
+        isVideoVisible: true,
         isMuted: false,
       },
     ]
@@ -204,6 +212,7 @@ describe('getShareableUrl', () => {
         platform: 'youtube',
         isLive: true,
         isChatVisible: false,
+        isVideoVisible: true,
         isMuted: false,
       },
     ]
@@ -292,6 +301,7 @@ describe('encode/decode roundtrip', () => {
         platform: 'youtube',
         isLive: true,
         isChatVisible: false,
+        isVideoVisible: true,
         isMuted: false,
       },
     ]
@@ -312,6 +322,7 @@ describe('encode/decode roundtrip', () => {
         twitchType: 'channel',
         isLive: true,
         isChatVisible: false,
+        isVideoVisible: true,
         isMuted: false,
       },
     ]

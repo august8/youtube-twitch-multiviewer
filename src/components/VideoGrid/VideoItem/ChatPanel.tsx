@@ -2,9 +2,10 @@ interface ChatPanelProps {
   platform: 'youtube' | 'twitch'
   videoId: string
   twitchType?: 'channel' | 'vod'
+  fillWidth?: boolean
 }
 
-export function ChatPanel({ platform, videoId, twitchType }: ChatPanelProps) {
+export function ChatPanel({ platform, videoId, twitchType, fillWidth = false }: ChatPanelProps) {
   const domain = window.location.hostname || 'localhost'
   const darkMode = 1 // Always dark mode
 
@@ -31,7 +32,9 @@ export function ChatPanel({ platform, videoId, twitchType }: ChatPanelProps) {
 
   return (
     <div
-      className="w-[340px] min-w-[280px] bg-light-card dark:bg-dark-card"
+      className={`bg-light-card dark:bg-dark-card h-full ${
+        fillWidth ? 'w-full' : 'w-[340px] min-w-[280px]'
+      }`}
       onContextMenu={handleContextMenu}
       title={platform === 'youtube' ? '右クリックで別ウィンドウで開く' : undefined}
     >

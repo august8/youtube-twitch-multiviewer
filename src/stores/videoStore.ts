@@ -27,6 +27,7 @@ export const useVideoStore = create<VideoState>((set, get) => ({
             ...video,
             id,
             isChatVisible: false,
+            isVideoVisible: true,
             isMuted: false,
           },
         ],
@@ -56,6 +57,13 @@ export const useVideoStore = create<VideoState>((set, get) => ({
       ),
     })),
 
+  toggleVideo: (id) =>
+    set((state) => ({
+      videos: state.videos.map((v) =>
+        v.id === id ? { ...v, isVideoVisible: !v.isVideoVisible } : v
+      ),
+    })),
+
   toggleMute: (id) =>
     set((state) => ({
       videos: state.videos.map((v) => (v.id === id ? { ...v, isMuted: !v.isMuted } : v)),
@@ -80,6 +88,7 @@ export const useVideoStore = create<VideoState>((set, get) => ({
       ...video,
       id: `${video.videoId}-${Date.now()}-${index}`,
       isChatVisible: false,
+      isVideoVisible: true,
       isMuted: false,
     }))
     const videoOrder: Record<string, number> = {}

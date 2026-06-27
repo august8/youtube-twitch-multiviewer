@@ -31,6 +31,7 @@ describe('videoStore', () => {
       expect(videos[0].platform).toBe('youtube')
       expect(videos[0].isLive).toBe(true)
       expect(videos[0].isChatVisible).toBe(false)
+      expect(videos[0].isVideoVisible).toBe(true)
       expect(videos[0].isMuted).toBe(false)
     })
 
@@ -93,6 +94,24 @@ describe('videoStore', () => {
 
       toggleChat(videoId)
       expect(useVideoStore.getState().videos[0].isChatVisible).toBe(false)
+    })
+  })
+
+  describe('toggleVideo', () => {
+    it('should toggle video visibility', () => {
+      const { addVideo, toggleVideo } = useVideoStore.getState()
+
+      addVideo({ videoId: 'abc123', platform: 'youtube', isLive: true })
+      const { videos } = useVideoStore.getState()
+      const videoId = videos[0].id
+
+      expect(videos[0].isVideoVisible).toBe(true)
+
+      toggleVideo(videoId)
+      expect(useVideoStore.getState().videos[0].isVideoVisible).toBe(false)
+
+      toggleVideo(videoId)
+      expect(useVideoStore.getState().videos[0].isVideoVisible).toBe(true)
     })
   })
 
@@ -209,6 +228,8 @@ describe('videoStore', () => {
       expect(videos).toHaveLength(2)
       expect(Object.keys(videoOrder)).toHaveLength(2)
       expect(isWelcomeVisible).toBe(false)
+      expect(videos[0].isVideoVisible).toBe(true)
+      expect(videos[1].isVideoVisible).toBe(true)
     })
   })
 })

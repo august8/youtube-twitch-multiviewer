@@ -9,6 +9,7 @@ export interface VideoItem {
   twitchType?: 'channel' | 'vod'
   isLive: boolean
   isChatVisible: boolean
+  isVideoVisible: boolean
   isMuted: boolean
 }
 
@@ -22,10 +23,11 @@ export interface VideoState {
   themeMode: ThemeMode
   locale: Locale
 
-  addVideo: (video: Omit<VideoItem, 'id' | 'isChatVisible' | 'isMuted'>) => void
+  addVideo: (video: Omit<VideoItem, 'id' | 'isChatVisible' | 'isVideoVisible' | 'isMuted'>) => void
   removeVideo: (id: string) => void
   resetVideos: () => void
   toggleChat: (id: string) => void
+  toggleVideo: (id: string) => void
   toggleMute: (id: string) => void
   setYtApiReady: (ready: boolean) => void
   setModalOpen: (open: boolean) => void
@@ -34,7 +36,9 @@ export interface VideoState {
   setThemeMode: (mode: ThemeMode) => void
   setLocale: (locale: Locale) => void
   startViewing: () => void
-  loadVideosFromUrl: (videos: Omit<VideoItem, 'id' | 'isChatVisible' | 'isMuted'>[]) => void
+  loadVideosFromUrl: (
+    videos: Omit<VideoItem, 'id' | 'isChatVisible' | 'isVideoVisible' | 'isMuted'>[]
+  ) => void
   reorderVideos: (activeId: string, overId: string) => void
   getOrderedVideos: () => VideoItem[]
 }
