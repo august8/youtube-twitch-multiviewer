@@ -11,24 +11,41 @@ import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable'
 import { useVideoStore } from '@/stores/videoStore'
 import { useGridLayout } from '@/hooks/useGridLayout'
 import { SortableVideoItem } from './SortableVideoItem'
-import type { LayoutMode } from '@/types/video'
+import type { LayoutMode, VideoItem } from '@/types/video'
+
+const HIDDEN_WITH_CHAT_TRACK = '0.5fr'
+const HIDDEN_NO_CHAT_TRACK = 'auto'
+
+function getSlotTrackSize(video: VideoItem): string {
+  if (video.isVideoVisible) return '1fr'
+  if (video.isChatVisible && video.isLive) return HIDDEN_WITH_CHAT_TRACK
+  return HIDDEN_NO_CHAT_TRACK
+}
+
+function buildTracks(videos: VideoItem[]): string {
+  if (videos.length === 0) return '1fr'
+  const sizes = videos.map(getSlotTrackSize)
+  return sizes.every((s) => s === '1fr') ? `repeat(${sizes.length}, 1fr)` : sizes.join(' ')
+}
 
 export function getLayoutStyle(
   layoutMode: LayoutMode,
-  videoCount: number,
+  orderedVideos: VideoItem[],
   cols: number,
-  rows: number
+  rows: number,
+  mainVideoId?: string | null
 ): React.CSSProperties {
+  const videoCount = orderedVideos.length
   switch (layoutMode) {
     case 'horizontal':
       return {
-        gridTemplateColumns: `repeat(${videoCount}, 1fr)`,
+        gridTemplateColumns: buildTracks(orderedVideos),
         gridTemplateRows: '1fr',
       }
     case 'vertical':
       return {
         gridTemplateColumns: '1fr',
-        gridTemplateRows: `repeat(${videoCount}, 1fr)`,
+        gridTemplateRows: buildTracks(orderedVideos),
       }
     case 'focus': {
       if (videoCount <= 1) {
@@ -37,10 +54,12 @@ export function getLayoutStyle(
           gridTemplateRows: '1fr',
         }
       }
-      const subRows = videoCount - 1
+      const mainVideo = orderedVideos.find((v) => v.id === mainVideoId) ?? orderedVideos[0]
+      const subVideos = orderedVideos.filter((v) => v.id !== mainVideo.id)
+      const mainHidden = !mainVideo.isVideoVisible
       return {
-        gridTemplateColumns: '7fr 3fr',
-        gridTemplateRows: `repeat(${subRows}, 1fr)`,
+        gridTemplateColumns: mainHidden ? 'auto 1fr' : '7fr 3fr',
+        gridTemplateRows: buildTracks(subVideos),
       }
     }
     case 'grid':
@@ -78,25 +97,20 @@ export function VideoGrid() {
     [reorderVideos]
   )
 
-  const layoutStyle = useMemo(
-    () => getLayoutStyle(layoutMode, videos.length, cols, rows),
-    [layoutMode, videos.length, cols, rows]
-  )
-
-  // Get sorted video IDs for SortableContext
-  const sortedVideoIds = useMemo(() => {
-    return getOrderedVideos().map((v) => v.id)
-  }, [getOrderedVideos])
+  const orderedVideos = useMemo(() => getOrderedVideos(), [getOrderedVideos, videos, videoOrder])
 
   // Find the main video (lowest order) for focus mode
   const mainVideoId = useMemo(() => {
-    if (videos.length === 0) return null
-    return videos.reduce((minVideo, video) => {
-      const minOrder = videoOrder[minVideo.id] ?? Infinity
-      const currentOrder = videoOrder[video.id] ?? Infinity
-      return currentOrder < minOrder ? video : minVideo
-    }).id
-  }, [videos, videoOrder])
+    if (orderedVideos.length === 0) return null
+    return orderedVideos[0].id
+  }, [orderedVideos])
+
+  const layoutStyle = useMemo(
+    () => getLayoutStyle(layoutMode, orderedVideos, cols, rows, mainVideoId),
+    [layoutMode, orderedVideos, cols, rows, mainVideoId]
+  )
+
+  const sortedVideoIds = useMemo(() => orderedVideos.map((v) => v.id), [orderedVideos])
 
   if (videos.length === 0) {
     return (
