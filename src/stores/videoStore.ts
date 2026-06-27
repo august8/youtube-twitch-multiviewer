@@ -67,9 +67,13 @@ export const useVideoStore = create<VideoState>((set, get) => ({
     })),
 
   setMuted: (id, muted) =>
-    set((state) => ({
-      videos: state.videos.map((v) => (v.id === id ? { ...v, isMuted: muted } : v)),
-    })),
+    set((state) => {
+      const target = state.videos.find((v) => v.id === id)
+      if (!target || target.isMuted === muted) return state
+      return {
+        videos: state.videos.map((v) => (v.id === id ? { ...v, isMuted: muted } : v)),
+      }
+    }),
 
   setYtApiReady: (ready) => set({ ytApiReady: ready }),
 

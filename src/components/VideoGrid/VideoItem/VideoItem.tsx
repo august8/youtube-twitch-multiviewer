@@ -42,6 +42,13 @@ export const VideoItem = memo(function VideoItem({ video }: VideoItemProps) {
     }
   }, [video.id, video.platform, setMuted])
 
+  const handleMuteChange = useCallback(
+    (muted: boolean) => {
+      setMuted(video.id, muted)
+    },
+    [video.id, setMuted]
+  )
+
   const handleChatToggle = useCallback(() => {
     if (video.isLive) {
       toggleChat(video.id)
@@ -83,12 +90,14 @@ export const VideoItem = memo(function VideoItem({ video }: VideoItemProps) {
                   ref={twitchPlayerRef}
                   videoId={video.videoId}
                   twitchType={video.twitchType || 'channel'}
+                  onMuteChange={handleMuteChange}
                 />
               ) : (
                 <YouTubePlayer
                   ref={youtubePlayerRef}
                   videoId={video.videoId}
                   onTimeUpdate={handleTimeUpdate}
+                  onMuteChange={handleMuteChange}
                 />
               )}
             </ErrorBoundary>

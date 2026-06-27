@@ -11,6 +11,7 @@ import { useVideoStore } from '@/stores/videoStore'
 interface TwitchPlayerProps {
   videoId: string
   twitchType: 'channel' | 'vod'
+  onMuteChange?: (muted: boolean) => void
 }
 
 export interface TwitchPlayerHandle {
@@ -28,7 +29,7 @@ export function buildTwitchEmbedUrl(
 }
 
 export const TwitchPlayer = forwardRef<TwitchPlayerHandle, TwitchPlayerProps>(
-  function TwitchPlayer({ videoId, twitchType }, ref) {
+  function TwitchPlayer({ videoId, twitchType, onMuteChange }, ref) {
     const twitchApiReady = useVideoStore((state) => state.twitchApiReady)
     const playerRef = useRef<TwitchPlayerInstance | null>(null)
     const containerRef = useRef<HTMLDivElement>(null)
@@ -75,7 +76,19 @@ export const TwitchPlayer = forwardRef<TwitchPlayerHandle, TwitchPlayerProps>(
       player.addEventListener(window.Twitch.Player.READY, handleReady)
       player.addEventListener(window.Twitch.Player.PLAYING, handlePlaying)
 
+      // Twitch has no mute-change event, so poll to keep external UI in sync.
+      const muteInterval = window.setInterval(() => {
+        try {
+          if (playerRef.current) {
+            onMuteChange?.(playerRef.current.getMuted())
+          }
+        } catch {
+          // ignore until player is ready
+        }
+      }, 1000)
+
       return () => {
+        window.clearInterval(muteInterval)
         try {
           player.removeEventListener(window.Twitch!.Player.READY, handleReady)
           player.removeEventListener(window.Twitch!.Player.PLAYING, handlePlaying)
@@ -90,7 +103,7 @@ export const TwitchPlayer = forwardRef<TwitchPlayerHandle, TwitchPlayerProps>(
           containerRef.current.innerHTML = ''
         }
       }
-    }, [twitchApiReady, videoId, twitchType])
+    }, [twitchApiReady, videoId, twitchType, onMuteChange])
 
     return (
       <div className="relative w-full h-full">

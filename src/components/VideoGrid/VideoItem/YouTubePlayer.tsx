@@ -11,11 +11,12 @@ export interface YouTubePlayerHandle {
 interface YouTubePlayerProps {
   videoId: string
   onTimeUpdate?: (time: number) => void
+  onMuteChange?: (muted: boolean) => void
   onReady?: () => void
 }
 
 export const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>(
-  function YouTubePlayer({ videoId, onTimeUpdate, onReady }, ref) {
+  function YouTubePlayer({ videoId, onTimeUpdate, onMuteChange, onReady }, ref) {
     const ytApiReady = useVideoStore((state) => state.ytApiReady)
     const playerRef = useRef<YT.Player | null>(null)
     const containerRef = useRef<HTMLDivElement>(null)
@@ -67,6 +68,8 @@ export const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>
                 try {
                   const time = playerRef.current.getCurrentTime()
                   onTimeUpdate?.(time)
+                  const muted = playerRef.current.isMuted()
+                  onMuteChange?.(muted)
                 } catch {
                   // Player not ready
                 }
@@ -93,7 +96,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>
         }
         playerRef.current?.destroy()
       }
-    }, [ytApiReady, videoId, onTimeUpdate, onReady])
+    }, [ytApiReady, videoId, onTimeUpdate, onMuteChange, onReady])
 
     return (
       <div className="relative w-full h-full">
