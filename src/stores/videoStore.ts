@@ -12,6 +12,7 @@ export const useVideoStore = create<VideoState>((set, get) => ({
   isWelcomeVisible: true,
   isModalOpen: false,
   ytApiReady: false,
+  twitchApiReady: false,
   layoutMode: 'grid',
   themeMode: 'system',
   locale: getInitialLocale(),
@@ -65,12 +66,14 @@ export const useVideoStore = create<VideoState>((set, get) => ({
       ),
     })),
 
-  toggleMute: (id) =>
+  setMuted: (id, muted) =>
     set((state) => ({
-      videos: state.videos.map((v) => (v.id === id ? { ...v, isMuted: !v.isMuted } : v)),
+      videos: state.videos.map((v) => (v.id === id ? { ...v, isMuted: muted } : v)),
     })),
 
   setYtApiReady: (ready) => set({ ytApiReady: ready }),
+
+  setTwitchApiReady: (ready) => set({ twitchApiReady: ready }),
 
   setModalOpen: (open) => set({ isModalOpen: open }),
 

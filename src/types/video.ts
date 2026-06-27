@@ -19,6 +19,7 @@ export interface VideoState {
   isWelcomeVisible: boolean
   isModalOpen: boolean
   ytApiReady: boolean
+  twitchApiReady: boolean
   layoutMode: LayoutMode
   themeMode: ThemeMode
   locale: Locale
@@ -29,8 +30,9 @@ export interface VideoState {
   resetVideos: () => void
   toggleChat: (id: string) => void
   toggleVideo: (id: string) => void
-  toggleMute: (id: string) => void
+  setMuted: (id: string, muted: boolean) => void
   setYtApiReady: (ready: boolean) => void
+  setTwitchApiReady: (ready: boolean) => void
   setModalOpen: (open: boolean) => void
   setWelcomeVisible: (visible: boolean) => void
   setLayoutMode: (mode: LayoutMode) => void

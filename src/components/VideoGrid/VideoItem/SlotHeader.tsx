@@ -1,7 +1,6 @@
 import { memo } from 'react'
 
 interface SlotHeaderProps {
-  platform: 'youtube' | 'twitch'
   isVideoVisible: boolean
   isMuted: boolean
   isChatVisible: boolean
@@ -13,7 +12,6 @@ interface SlotHeaderProps {
 }
 
 export const SlotHeader = memo(function SlotHeader({
-  platform,
   isVideoVisible,
   isMuted,
   isChatVisible,
@@ -23,8 +21,6 @@ export const SlotHeader = memo(function SlotHeader({
   onChatToggle,
   onDelete,
 }: SlotHeaderProps) {
-  const isTwitch = platform === 'twitch'
-
   return (
     <div className="flex items-center justify-end gap-1 px-2 py-1 bg-light-control dark:bg-dark-control border-b border-black/10 dark:border-white/10">
       <button
@@ -43,21 +39,12 @@ export const SlotHeader = memo(function SlotHeader({
 
       <button
         onClick={onMuteToggle}
-        disabled={isTwitch}
         className={`px-2 py-1 text-xs rounded focus:outline-none focus:ring-2 focus:ring-white ${
-          isTwitch
-            ? 'bg-gray-600/50 text-gray-400 cursor-not-allowed'
-            : !isMuted
-              ? 'bg-green-600/80 hover:bg-green-600 text-white'
-              : 'bg-gray-600/80 hover:bg-gray-600 text-white'
+          !isMuted
+            ? 'bg-green-600/80 hover:bg-green-600 text-white'
+            : 'bg-gray-600/80 hover:bg-gray-600 text-white'
         }`}
-        title={
-          isTwitch
-            ? 'Twitchプレイヤーで直接操作してください'
-            : isMuted
-              ? 'ミュート解除'
-              : 'ミュート'
-        }
+        title={isMuted ? 'ミュート解除' : 'ミュート'}
         aria-label={isMuted ? 'ミュート解除' : 'ミュート'}
         aria-pressed={!isMuted}
       >

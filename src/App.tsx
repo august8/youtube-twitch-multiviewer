@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Toaster } from 'sonner'
 import { useVideoStore } from '@/stores/videoStore'
 import { useYouTubeAPI } from '@/hooks/useYouTubeAPI'
+import { useTwitchAPI } from '@/hooks/useTwitchAPI'
 import { WelcomeScreen } from '@/components/WelcomeScreen/WelcomeScreen'
 import { VideoGrid } from '@/components/VideoGrid/VideoGrid'
 import { ControlsModal } from '@/components/Modal/ControlsModal'
@@ -24,6 +25,8 @@ function App() {
 
   // Load YouTube IFrame API
   useYouTubeAPI()
+  // Load Twitch Embed JS API
+  useTwitchAPI()
 
   // Apply theme mode to document
   useEffect(() => {

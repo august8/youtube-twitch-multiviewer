@@ -4,7 +4,7 @@ import type { VideoItem as VideoItemType } from '@/types/video'
 import { useVideoStore } from '@/stores/videoStore'
 import { useTranslation } from '@/i18n'
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
-import { TwitchPlayer } from './TwitchPlayer'
+import { TwitchPlayer, type TwitchPlayerHandle } from './TwitchPlayer'
 import { YouTubePlayer, type YouTubePlayerHandle } from './YouTubePlayer'
 import { VideoControls } from './VideoControls'
 import { ChatPanel } from './ChatPanel'
@@ -18,9 +18,10 @@ export const VideoItem = memo(function VideoItem({ video }: VideoItemProps) {
   const removeVideo = useVideoStore((state) => state.removeVideo)
   const toggleChat = useVideoStore((state) => state.toggleChat)
   const toggleVideo = useVideoStore((state) => state.toggleVideo)
-  const toggleMute = useVideoStore((state) => state.toggleMute)
+  const setMuted = useVideoStore((state) => state.setMuted)
   const t = useTranslation()
   const youtubePlayerRef = useRef<YouTubePlayerHandle>(null)
+  const twitchPlayerRef = useRef<TwitchPlayerHandle>(null)
   const [currentTime, setCurrentTime] = useState(0)
 
   const handleTimeUpdate = useCallback((time: number) => {
@@ -32,13 +33,14 @@ export const VideoItem = memo(function VideoItem({ video }: VideoItemProps) {
   }, [])
 
   const handleMuteToggle = useCallback(() => {
-    if (video.platform === 'youtube') {
-      const isMuted = youtubePlayerRef.current?.toggleMute()
-      if (isMuted !== undefined) {
-        toggleMute(video.id)
-      }
+    const newMuted =
+      video.platform === 'youtube'
+        ? youtubePlayerRef.current?.toggleMute()
+        : twitchPlayerRef.current?.toggleMute()
+    if (newMuted !== undefined) {
+      setMuted(video.id, newMuted)
     }
-  }, [video.id, video.platform, toggleMute])
+  }, [video.id, video.platform, setMuted])
 
   const handleChatToggle = useCallback(() => {
     if (video.isLive) {
@@ -62,7 +64,6 @@ export const VideoItem = memo(function VideoItem({ video }: VideoItemProps) {
   return (
     <div className="flex flex-col bg-light-card dark:bg-dark-card rounded-lg overflow-hidden min-w-0 h-full">
       <SlotHeader
-        platform={video.platform}
         isVideoVisible={video.isVideoVisible}
         isMuted={video.isMuted}
         isChatVisible={video.isChatVisible}
@@ -79,6 +80,7 @@ export const VideoItem = memo(function VideoItem({ video }: VideoItemProps) {
             <ErrorBoundary>
               {video.platform === 'twitch' ? (
                 <TwitchPlayer
+                  ref={twitchPlayerRef}
                   videoId={video.videoId}
                   twitchType={video.twitchType || 'channel'}
                 />

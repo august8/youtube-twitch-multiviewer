@@ -115,9 +115,9 @@ describe('videoStore', () => {
     })
   })
 
-  describe('toggleMute', () => {
-    it('should toggle mute state', () => {
-      const { addVideo, toggleMute } = useVideoStore.getState()
+  describe('setMuted', () => {
+    it('should set mute state to the given value', () => {
+      const { addVideo, setMuted } = useVideoStore.getState()
 
       addVideo({ videoId: 'abc123', platform: 'youtube', isLive: true })
       const { videos } = useVideoStore.getState()
@@ -125,10 +125,10 @@ describe('videoStore', () => {
 
       expect(videos[0].isMuted).toBe(false)
 
-      toggleMute(videoId)
+      setMuted(videoId, true)
       expect(useVideoStore.getState().videos[0].isMuted).toBe(true)
 
-      toggleMute(videoId)
+      setMuted(videoId, false)
       expect(useVideoStore.getState().videos[0].isMuted).toBe(false)
     })
   })
